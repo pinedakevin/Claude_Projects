@@ -1,0 +1,29 @@
+place,kind,lat,lon
+Salt Lake City,city,40.7608,-111.8910
+West Valley City,city,40.6916,-112.0011
+Taylorsville,city,40.6677,-111.9388
+Kearns,city,40.6600,-111.9963
+Magna,city,40.7091,-112.1016
+Murray,city,40.6669,-111.8880
+West Jordan,city,40.6097,-111.9391
+South Jordan,city,40.5622,-111.9297
+Riverton,city,40.5219,-111.9391
+Herriman,city,40.5141,-112.0330
+Sandy,city,40.5649,-111.8389
+Draper,city,40.5247,-111.8638
+Millcreek,city,40.6869,-111.8755
+Holladay,city,40.6688,-111.8247
+Cottonwood Heights,city,40.6197,-111.8102
+Midvale,city,40.6111,-111.8999
+Bluffdale,city,40.4897,-111.9388
+Lehi,city,40.3916,-111.8508
+Saratoga Springs,city,40.3494,-111.9047
+Eagle Mountain,city,40.3141,-112.0069
+"University of Utah",destination,40.7649,-111.8421
+"SLC International Airport",destination,40.7899,-111.9791
+"Silicon Slopes (Lehi, Thanksgiving Point)",destination,40.429,-111.893
+"Provo / BYU",destination,40.2518,-111.6493
+"Hill Air Force Base",destination,41.124,-111.973
+"SLC VA Medical Center",destination,40.7569,-111.8366
+"Intermountain Medical Center (Murray)",destination,40.6596,-111.8925
+"Zions Technology Center (Midvale)",destination,40.6125,-111.906

@@ -1,0 +1,12 @@
+{
+  "refreshed_at": "2026-10-25T06:30:00Z",
+  "sources": {
+    "Home values": "Zillow, Sep 2026",
+    "Mortgage rates": "Freddie Mac week of Oct 22, 2026; VA and FHA quotes Oct 23, 2026",
+    "Rents": "466 live house listings, Oct 24, 2026",
+    "Crime": "NeighborhoodScout 2024 and FBI 2025",
+    "Schools": "USBE 2025\u201326, Niche, GreatSchools (Oct 2026)",
+    "Census": "QuickFacts 2025 / ACS 2020\u20132024",
+    "Drive times": "OpenStreetMap routing, Oct 2026"
+  }
+}

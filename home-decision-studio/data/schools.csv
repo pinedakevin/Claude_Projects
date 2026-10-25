@@ -1,0 +1,21 @@
+city,district,niche_city_grade,niche_district_grade,gs_elem_avg,gs_elem_rated,gs_elem_7plus,district_ela_pct,district_math_pct,district_note
+Salt Lake City,Salt Lake City,B+,A-,5.9,23,10,42.2,41.4,GreatSchools figure uses SLC district schools only
+West Valley City,Granite,C+,B,4.1,28,1,32.9,29.1,
+Taylorsville,Granite,B-,B,3.8,4,0,32.9,29.1,
+Kearns,Granite,C+,B,3.9,7,0,32.9,29.1,
+Magna,Granite,C,B,3.5,6,0,32.9,29.1,
+Murray,Murray,B,B+,6.2,8,4,45.0,41.7,
+West Jordan,Jordan,B-,B,4.8,21,2,46.1,40.9,
+South Jordan,Jordan,B,B,6.9,12,8,46.1,40.9,
+Riverton,Jordan,B,B,6.7,6,4,46.1,40.9,
+Herriman,Jordan,B,B,5.8,10,5,46.1,40.9,
+Sandy,Canyons,B+,A-,7.3,17,11,50.9,47.2,
+Draper,Canyons,A-,A-,8.0,7,6,50.9,47.2,SunCrest area is in Alpine
+Millcreek,Granite,B+,B,6.3,18,,32.9,29.1,GreatSchools figure uses Granite schools only
+Holladay,Granite,B+,B,,,,32.9,29.1,GreatSchools lists Holladay schools under Salt Lake City
+Cottonwood Heights,Canyons,A,A-,7.0,3,2,50.9,47.2,
+Midvale,Canyons,B+,A-,4.0,4,0,50.9,47.2,
+Bluffdale,Jordan,B,B,6.7,6,3,46.1,40.9,
+Lehi,Alpine (Aspen Peaks from July 2027),B+,A-,7.3,15,11,51.3,49.4,
+Saratoga Springs,Alpine (Lake Mountain from July 2027),B+,A-,5.9,11,5,51.3,49.4,District schools alone average 7.0
+Eagle Mountain,Alpine (Lake Mountain from July 2027),B,A-,6.3,10,5,51.3,49.4,

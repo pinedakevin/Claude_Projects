@@ -1,0 +1,21 @@
+city,listings,median_rent,p25_rent,p75_rent,listings_3bd,median_3bd,listings_4bd,median_4bd,median_sqft,pool_cities,pool_listings,pool_median_rent,sources
+Bluffdale,11,2800,2425,2995,3,2330,8,2850,3103,"Riverton, Herriman, Draper, South Jordan",57,2700,"Zillow, Realtor.com, Rentler, Zumper, UtahRealEstate"
+Cottonwood Heights,17,3450,2895,3950,5,2495,12,3600,2199,,,,Zillow
+Draper,20,2750,2438,2825,11,2700,9,2795,2095,"Sandy, South Jordan, Bluffdale",53,2800,"Zillow, Realtor.com, Rentler, KSL, Zumper, UtahRealEstate"
+Herriman,19,2600,2238,2797,9,2275,10,2648,2408,,,,Zillow
+Holladay,19,3200,2795,3798,7,2895,12,3375,2205,"Millcreek, Cottonwood Heights, Murray",58,2978,"Zillow, Realtor.com, Rentler, KSL, Zumper, UtahRealEstate"
+Kearns,12,2500,2373,2718,6,2450,6,2649,1474,"West Valley City, Taylorsville, Magna, West Jordan",85,2450,"Zillow, Realtor.com, Rentler, Zumper"
+Magna,4,2248,2128,2374,3,2300,1,2195,1976,"Kearns, West Valley City, West Jordan",69,2475,"Zillow, Rentler, Zumper"
+Midvale,17,2500,2300,2600,9,2450,8,2600,1950,,,,Zillow
+Millcreek,25,3200,2900,3995,6,2900,19,3495,1900,,,,Zillow
+Murray,16,2500,2300,2801,11,2400,5,2750,1850,,,,Zillow
+Riverton,9,2650,2375,2895,3,2650,6,2698,2470,"Herriman, South Jordan, Bluffdale",47,2695,"Zillow, Realtor.com, Rentler, KSL, Zumper, UtahRealEstate"
+Salt Lake City,57,2850,2500,3500,25,3000,32,2798,1880,,,,Zillow
+Sandy,25,2800,2680,3400,5,2950,20,2775,2200,,,,Zillow
+South Jordan,21,2800,2300,3200,6,2475,15,3200,2527,,,,Zillow
+Taylorsville,18,2348,2162,2650,9,2300,9,2495,1784,,,,Zillow
+West Jordan,36,2485,2300,2811,11,2300,25,2550,1839,,,,Zillow
+West Valley City,28,2462,2338,2561,8,2248,20,2498,1924,,,,Zillow
+Lehi,42,2500,2295,2790,15,2295,27,2608,2395,,,,Zillow
+Saratoga Springs,41,2495,2200,2650,20,2198,21,2638,2326,,,,Zillow
+Eagle Mountain,29,2420,2328,2593,7,2278,22,2523,2455,,,,Zillow

@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Decision Studio</title>
+<meta name="description" content="Compare 20 Salt Lake County and north Utah County cities on cost, buying vs renting, safety, schools and drive times, with conventional, FHA and VA loans.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+ --color-fg:#1f1e1d;--color-fg-muted:#6b6963;--color-bg:#faf9f5;--color-panel:#ffffff;--color-border-line:#e5e1d6;
+ --color-ok:#3f7a3a;--color-warn:#a8650f;--color-bad:#b4472e;
+ --s1:#c96442;--s2:#7a8f5c;--s3:#5f8fbf;--s4:#b8975f;--s5:#8a6fb0;--s6:#3f9a9a;--s7:#c27c99;--s8:#6b6963;
+ --cds-font-size-caption:12px;--cds-font-size-body:14px;--cds-font-size-heading:16px;--cds-font-size-title:30px;--cds-font-weight-medium:600;
+ --cds-gap-xs:4px;--cds-gap-sm:8px;--cds-gap-md:12px;--cds-gap-lg:20px;
+ --cds-pad-xs:4px;--cds-pad-sm:8px;--cds-pad-md:12px;--cds-pad-lg:18px;--cds-radius:10px;
+ --cds-border:#e5e1d6;--cds-text-secondary:#6b6963;--cds-surface-popover:#ffffff;--cds-shadow-popover:0 6px 20px rgba(0,0,0,.12);
+ --cds-dur-slow:300ms;--cds-chart-grid:#ece8de;
+ --font-anthropic-sans:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+ --font-anthropic-serif:"Newsreader","Iowan Old Style",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root{
+ --color-fg:#f2f0e8;--color-fg-muted:#a8a69c;--color-bg:#262624;--color-panel:#30302e;--color-border-line:#43423e;
+ --color-ok:#8cc47f;--color-warn:#e0a85a;--color-bad:#ec8a70;
+ --s1:#e0896a;--s2:#a3b882;--s3:#8db4dc;--s4:#d4b580;--s5:#b49ad6;--s6:#7cc4c4;--s7:#e0a3bd;--s8:#a8a69c;
+ --cds-border:#43423e;--cds-text-secondary:#a8a69c;--cds-surface-popover:#30302e;--cds-chart-grid:#3a3936;color-scheme:dark;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(--font-anthropic-sans);font-size:14px;line-height:1.45}
+#dash-root{padding:28px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.dash-skeleton{}
+.snap{font-size:12px;color:var(--color-fg-muted);max-width:1200px;margin:16px auto 0}
+
+.snap a { color: inherit; }
+</style>
+</head>
+<body>
+<div id="dash-root"><style>
+#dash-root { --dash-gutter: clamp(12px, 3vw, 32px); }
+.ds { font-family: var(--font-anthropic-sans); color: var(--color-fg); max-width: 1280px; margin-inline: auto; display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.ds * { box-sizing: border-box; }
+.ds .eyebrow { font-size: var(--cds-font-size-caption); letter-spacing: .08em; text-transform: uppercase; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.ds h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.5rem); line-height: 1.12; margin: 4px 0 6px; text-wrap: balance; letter-spacing: -0.01em; }
+.ds .lede { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: 0; max-width: 62rem; line-height: 1.55; }
+.ds .lede b { color: var(--color-fg); font-weight: 600; }
+.ds .card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: calc(var(--cds-radius) + 4px); padding: var(--cds-pad-lg); min-width: 0; }
+.ds h2 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 1.35rem; margin: 0; line-height: 1.2; }
+.ds h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.ds .note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.5; margin: 4px 0 0; }
+.ds .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin-bottom: var(--cds-gap-md); }
+
+/* ---------- control bar ---------- */
+.ds .bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--cds-gap-lg); }
+.ds .grp { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ds .grp > .gt { font-size: var(--cds-font-size-caption); letter-spacing: .08em; text-transform: uppercase; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.ds .fld { display: flex; flex-direction: column; gap: 4px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.ds .fld .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ds .fld output { color: var(--color-fg); font-variant-numeric: tabular-nums; font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); }
+.ds input[type=range] { width: 100%; accent-color: var(--color-fg); margin: 0; }
+.ds .seg { display: flex; border: 1px solid var(--color-border-line); border-radius: 999px; padding: 2px; gap: 2px; background: var(--color-bg); }
+.ds .seg button { flex: 1; appearance: none; border: 0; background: none; font: inherit; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); padding: 5px 8px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.ds .seg button[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); }
+.ds .tog { display: flex; align-items: center; gap: 8px; font-size: var(--cds-font-size-caption); color: var(--color-fg); cursor: pointer; }
+.ds .tog input { accent-color: var(--color-fg); width: 16px; height: 16px; }
+.ds details.more { grid-column: 1 / -1; border-top: 1px dashed var(--color-border-line); padding-top: var(--cds-pad-sm); }
+.ds details.more summary { cursor: pointer; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.ds details.more .inner { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--cds-gap-md); margin-top: var(--cds-gap-sm); }
+.ds .num { width: 100%; font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 5px 8px; font-variant-numeric: tabular-nums; }
+.ds button:focus-visible, .ds input:focus-visible, .ds .rowc:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+
+/* ---------- priorities ---------- */
+.ds .prios { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: 8px; }
+.ds .prio { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); }
+.ds .prio .nm { display: flex; align-items: center; gap: 6px; font-size: var(--cds-font-size-caption); color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.ds .prio .nm i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+.ds .prio .ctl { display: flex; align-items: center; gap: 6px; }
+.ds .prio .ctl button { appearance: none; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); font: inherit; line-height: 1; cursor: pointer; flex: none; }
+.ds .pips { display: flex; gap: 3px; flex: 1; }
+.ds .pips span { flex: 1; height: 6px; border-radius: 3px; background: var(--color-border-line); }
+.ds .prio.off { opacity: .55; }
+
+/* ---------- hero ---------- */
+.ds .hero { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: var(--cds-gap-lg); }
+@media (max-width: 900px) { .ds .hero { grid-template-columns: minmax(0, 1fr); } }
+.ds .mapbox { position: relative; }
+.ds .mapbox svg { display: block; width: 100%; height: auto; }
+.ds .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: 8px; }
+.ds .legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ds .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.ds .best { display: flex; flex-direction: column; gap: var(--cds-gap-md); }
+.ds .best .top { display: flex; gap: var(--cds-gap-md); align-items: center; }
+.ds .best .name { font-family: var(--font-anthropic-serif); font-size: clamp(1.9rem, 1.4rem + 1.4vw, 2.6rem); line-height: 1.05; }
+.ds .best .sub { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: 4px; }
+.ds .kv { display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; font-size: var(--cds-font-size-body); }
+.ds .kv dt { color: var(--color-fg-muted); }
+.ds .kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--cds-font-weight-medium); }
+.ds .why { display: flex; flex-direction: column; gap: 6px; font-size: var(--cds-font-size-caption); line-height: 1.45; }
+.ds .why div { display: flex; gap: 8px; align-items: flex-start; }
+.ds .why b { font-weight: 600; }
+.ds .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.ds .chip.ok { color: var(--color-ok); background: color-mix(in srgb, var(--color-ok) 14%, transparent); }
+.ds .chip.warn { color: var(--color-warn); background: color-mix(in srgb, var(--color-warn) 16%, transparent); }
+.ds .chip.bad { color: var(--color-bad); background: color-mix(in srgb, var(--color-bad) 14%, transparent); }
+.ds .chip.neu { color: var(--color-fg-muted); background: color-mix(in srgb, var(--color-fg-muted) 14%, transparent); }
+.ds .btn { appearance: none; border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); font: inherit; font-size: var(--cds-font-size-caption); padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.ds .btn.primary { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+.ds .empty { font-size: var(--cds-font-size-body); color: var(--color-fg-muted); line-height: 1.5; }
+
+/* ---------- ranked list ---------- */
+.ds .list { display: flex; flex-direction: column; }
+.ds .rowc { display: grid; grid-template-columns: 2rem minmax(8rem, 1.2fr) minmax(8rem, 1.6fr) minmax(6.5rem, .9fr) minmax(7rem, 1fr) 7rem 2rem; gap: 10px; align-items: center; padding: 9px 6px; border-bottom: 1px solid var(--color-border-line); cursor: pointer; border-radius: 6px; }
+.ds .rowc:hover { background: color-mix(in srgb, var(--color-fg) 4%, transparent); }
+.ds .rowc.sel { background: color-mix(in srgb, var(--color-fg) 7%, transparent); }
+.ds .rowc.out { opacity: .55; }
+.ds .rowc.hd { cursor: default; font-size: 11px; color: var(--color-fg-muted); text-transform: uppercase; letter-spacing: .06em; padding-block: 4px 6px; }
+.ds .rowc.hd:hover { background: none; }
+.ds .rk { font-family: var(--font-anthropic-serif); font-size: 1.15rem; color: var(--color-fg-muted); text-align: center; }
+.ds .cn { font-weight: var(--cds-font-weight-medium); font-size: var(--cds-font-size-body); }
+.ds .cn small { display: block; font-weight: 400; color: var(--color-fg-muted); font-size: 11px; }
+.ds .sbar { display: flex; align-items: center; gap: 8px; }
+.ds .sbar .track { flex: 1; height: 10px; border-radius: 5px; background: var(--color-border-line); display: flex; overflow: hidden; }
+.ds .sbar .track i { height: 100%; display: block; }
+.ds .sbar b { font-variant-numeric: tabular-nums; font-size: var(--cds-font-size-body); min-width: 1.6rem; text-align: right; }
+.ds .cell { font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; line-height: 1.35; }
+.ds .cell strong { display: block; font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); }
+.ds .pin { appearance: none; border: 1px solid var(--color-border-line); background: var(--color-bg); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; color: var(--color-fg-muted); font-size: 14px; line-height: 1; }
+.ds .pin[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+@media (max-width: 760px) {
+  .ds .rowc { grid-template-columns: 1.6rem minmax(0, 1fr) minmax(0, 1fr) 2rem; }
+  .ds .rowc .c-pay, .ds .rowc .c-bvr, .ds .rowc .c-drv { display: none; }
+}
+
+/* ---------- detail ---------- */
+.ds .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 10px; margin-bottom: var(--cds-gap-md); }
+.ds .tile { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 10px 12px; background: var(--color-bg); display: flex; flex-direction: column; gap: 2px; }
+.ds .tile .k { font-size: 11px; color: var(--color-fg-muted); }
+.ds .tile .v { font-family: var(--font-anthropic-serif); font-size: 1.45rem; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.ds .tile .d { font-size: 11px; color: var(--color-fg-muted); line-height: 1.35; }
+.ds .split { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--cds-gap-lg); }
+@media (max-width: 900px) { .ds .split { grid-template-columns: minmax(0, 1fr); } }
+.ds .chartbox { position: relative; min-height: 80px; }
+.ds .chartbox svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ds .tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); min-width: 12rem; z-index: 5; }
+.ds .tip .t { color: var(--cds-text-secondary); margin-bottom: 4px; font-weight: 600; }
+.ds .tip .l { display: flex; justify-content: space-between; gap: var(--cds-gap-md); font-variant-numeric: tabular-nums; }
+.ds .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 4px 24px; margin-top: var(--cds-gap-md); }
+.ds .facts div { display: flex; justify-content: space-between; gap: 12px; font-size: var(--cds-font-size-caption); padding: 5px 0; border-bottom: 1px solid var(--color-border-line); }
+.ds .facts div span:first-child { color: var(--color-fg-muted); }
+.ds .facts div span:last-child { font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ---------- compare ---------- */
+.ds .cmp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--cds-gap-lg); align-items: start; }
+@media (max-width: 900px) { .ds .cmp { grid-template-columns: minmax(0, 1fr); } }
+.ds .tw { overflow-x: auto; }
+.ds table.ct { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.ds table.ct th, .ds table.ct td { padding: 7px 8px; border-bottom: 1px solid var(--color-border-line); text-align: right; white-space: nowrap; }
+.ds table.ct th:first-child, .ds table.ct td:first-child { text-align: left; color: var(--color-fg-muted); font-weight: 400; }
+.ds table.ct th { font-weight: var(--cds-font-weight-medium); }
+.ds table.ct th i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+.ds table.ct td.win { font-weight: 700; }
+.ds .method p, .ds .method li { font-size: var(--cds-font-size-caption); line-height: 1.6; color: var(--color-fg-muted); margin: 0 0 6px; }
+.ds .method ul { margin: 0; padding-left: 1.1rem; }
+.ds .method b { color: var(--color-fg); }
+.ds [hidden] { display: none !important; }
+@media (prefers-reduced-motion: no-preference) { .ds .sbar .track i, .ds .pips span { transition: background var(--cds-dur-slow), width var(--cds-dur-slow); } }
+</style>
+
+<div class="ds" id="studio">
+  <header>
+    <div class="eyebrow">Home decision studio</div>
+    <h1 id="title">Where should you buy, and should you buy at all?</h1>
+    <p class="lede" id="lede">Twenty cities in Salt Lake County and north Utah County. Set your loan, your limits, the places you drive to and what matters to you. <span id="lede-dyn"></span></p>
+  </header>
+
+  <section class="card" id="controls" aria-label="Your situation" data-source="mortgage_inputs places">
+    <div class="bar">
+      <div class="grp">
+        <div class="gt">About you</div>
+        <label class="tog"><input type="checkbox" id="c-isvet"> I'm a veteran or service member</label>
+        <div class="fld" id="w-rating"><span>VA disability rating (for Utah's property tax exemption)</span>
+          <select class="num" id="c-rating" aria-label="VA disability rating"></select></div>
+        <div class="fld" id="w-ffuse"><span>VA funding fee</span>
+          <div class="seg" id="c-ffuse" role="group" aria-label="VA funding fee status"><button data-v="first">First VA loan</button><button data-v="sub">Used one before</button><button data-v="exempt">Exempt</button></div>
+          <span class="note">Exempt if you get VA disability pay or a Purple Heart.</span></div>
+        <div class="note" id="vet-note">Turn this on to see VA loans: no down payment, no PMI, and in Utah a property tax break for disabled veterans.</div>
+      </div>
+      <div class="grp">
+        <div class="gt">Your loan</div>
+        <div class="seg" id="c-loan" role="group" aria-label="Loan type"><button data-v="conv">Conventional</button><button data-v="fha">FHA</button><button data-v="va">VA</button></div>
+        <div class="seg" id="c-term" role="group" aria-label="Loan term"><button data-v="30">30 years</button><button data-v="15">15 years</button></div>
+        <div class="fld"><div class="row"><span>Down payment</span><output id="o-down"></output></div><input type="range" id="c-down" min="0" max="50" step="0.5" aria-label="Down payment percent"></div>
+        <div class="fld"><span>Your rate (leave blank for this week's average)</span><input class="num" id="c-rate" inputmode="decimal" placeholder="" aria-label="Interest rate override"></div>
+        <div class="note" id="o-rate"></div>
+      </div>
+      <div class="grp">
+        <div class="gt">Your limits and places</div>
+        <div class="fld"><div class="row"><span>Most you'll pay each month</span><output id="o-budget"></output></div><input type="range" id="c-budget" min="1500" max="8000" step="50" aria-label="Monthly payment limit"></div>
+        <div class="fld"><span>Where you work</span><select class="num" id="c-work" aria-label="Where you work"></select></div>
+        <div class="fld" id="w-drive"><div class="row"><span>Longest drive to work</span><output id="o-drive"></output></div><input type="range" id="c-drive" min="5" max="75" step="1" aria-label="Longest drive to work in minutes"></div>
+        <div class="fld"><span>Another place you drive to often (family, school, gym)</span><select class="num" id="c-p2" aria-label="Second place"></select></div>
+      </div>
+      <div class="grp">
+        <div class="gt">Your horizon</div>
+        <div class="fld"><div class="row"><span>Years you'll stay</span><output id="o-years"></output></div><input type="range" id="c-years" min="1" max="30" step="1" aria-label="Years you will stay"></div>
+        <div class="fld"><div class="row"><span>Home value growth / yr</span><output id="o-appr"></output></div><input type="range" id="c-appr" min="0" max="8" step="0.5" aria-label="Home value growth per year"></div>
+        <div class="fld"><div class="row"><span>Rent growth / yr</span><output id="o-rentg"></output></div><input type="range" id="c-rentg" min="0" max="6" step="0.5" aria-label="Rent growth per year"></div>
+        <div class="fld"><span>Return on invested savings</span><div class="seg" id="c-ret" role="group" aria-label="Investment return"><button data-v="5">5% low</button><button data-v="7">7% base</button><button data-v="10">10% high</button></div></div>
+      </div>
+      <details class="more" id="more">
+        <summary>More assumptions</summary>
+        <div class="inner">
+          <div class="fld"><div class="row"><span>Closing costs (% of price)</span><output id="o-closing"></output></div><input type="range" id="c-closing" min="0" max="6" step="0.25" aria-label="Closing costs percent"></div>
+          <div class="fld"><div class="row"><span>Insurance / yr (% of value)</span><output id="o-ins"></output></div><input type="range" id="c-ins" min="0.1" max="1" step="0.01" aria-label="Insurance percent"></div>
+          <div class="fld"><div class="row"><span>PMI / yr (% of loan, under 20% down)</span><output id="o-pmi"></output></div><input type="range" id="c-pmi" min="0" max="1.5" step="0.05" aria-label="PMI percent"></div>
+          <div class="fld"><span>HOA ($ per month)</span><input class="num" id="c-hoa" inputmode="numeric" aria-label="HOA per month"></div>
+          <div class="fld"><div class="row"><span>Upkeep / yr (% of value)</span><output id="o-upkeep"></output></div><input type="range" id="c-upkeep" min="0" max="3" step="0.25" aria-label="Upkeep percent"></div>
+          <div class="fld"><div class="row"><span>Cost to sell (% of value)</span><output id="o-sell"></output></div><input type="range" id="c-sell" min="0" max="10" step="0.5" aria-label="Selling cost percent"></div>
+          <button class="btn" id="c-reset">Reset everything</button>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="card" id="priorities" data-source="base">
+    <div class="head"><div><h2>What matters to you</h2><p class="note">Each factor scores 0–100 against the other 19 cities. Your weights decide how much it counts; 0 turns it off.</p></div></div>
+    <div class="prios" id="prios"></div>
+  </section>
+
+  <div class="hero">
+    <section class="card" id="map-card">
+      <div class="head"><div><h2>The valley at a glance</h2><p class="note">Bigger dot = better overall score for you. Click a city to open it below.</p></div></div>
+      <div class="mapbox" id="map" data-source="base places"></div>
+      <div class="legend" id="map-legend"></div>
+    </section>
+    <section class="card best" id="best" data-source="base drive_matrix"></section>
+  </div>
+
+  <section class="card" id="list-card" data-source="base drive_matrix">
+    <div class="head"><div><h2>All 20, ranked for you</h2><p class="note">Click a row to open it below. Use + to pin up to three cities and compare them side by side.</p></div><div class="note" id="fit-count"></div></div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <section class="card" id="detail" data-source="base drive_matrix"></section>
+
+  <section class="card" id="compare" data-source="base drive_matrix">
+    <div class="head"><div><h2>Side by side</h2><p class="note" id="cmp-note"></p></div></div>
+    <div class="cmp">
+      <div class="chartbox" id="radar"></div>
+      <div class="tw"><table class="ct" id="cmp-table"></table></div>
+    </div>
+  </section>
+
+  <section class="card method" id="method">
+    <div class="head"><h2>How this works</h2></div>
+    <ul>
+      <li><b>Monthly payment</b> is principal and interest, county property tax, insurance, HOA and PMI (conventional loans under 20% down, until you reach 20% equity). The rate is this week's average for your loan type and term unless you type your own. The typical home is the average of Zillow's 3-bed, 4-bed and single-family values (Sep 2026).</li>
+      <li><b>FHA:</b> 3.5% minimum down. A 1.75% upfront mortgage insurance premium is added to the loan, plus a yearly premium (0.55% of the balance with under 5% down, 0.50% otherwise; 0.15–0.40% on 15-year loans). The yearly premium lasts the life of the loan unless you put 10% or more down, then it ends after 11 years. 2026 loan limits are $637,100 in Salt Lake County and $601,450 in Utah County; where the typical home is above that, the down payment is raised automatically to fit, and the list says how much more you'd need. The FHA 15-year rate is an estimate.</li>
+      <li><b>Veterans:</b> VA loans need no down payment and no PMI. The funding fee is 2.15% for a first VA loan (3.3% if you've used one) with under 5% down, 1.5% with 5% down and 1.25% with 10% or more, and it's added to the loan. Utah's disabled-veteran exemption takes your rating × $535,459 off the home's taxable value (55% of its market value).</li>
+      <li><b>Own vs rent</b> compares net worth after the years you'll stay. The owner pays the down payment, closing costs and all monthly costs including upkeep, and gets the home's value minus selling costs and the loan balance. The renter keeps the down payment and closing costs invested, pays rent, and invests any month their costs are lower; the owner invests any month owning is cheaper. Rent is the median of live 3–4 bed house listings.</li>
+      <li><b>Scores:</b> Cost from your payment; Own vs rent from the net-worth gap; Safety from NeighborhoodScout's 2024 crime rates; Schools from Niche, district test proficiency and GreatSchools; drive times with no traffic from each city's center to the places you pick; Value trend from Zillow's 1-year single-family change. Each is scaled 0–100 within these 20 cities.</li>
+      <li>Defaults: 4% a year home value growth (Zillow Research's long-run range is 3–5%), 3% rent growth, 7% returns, 3% closing costs, 1% upkeep, 7% to sell. Everything is a snapshot from Oct 24, 2026. Neighborhoods vary a lot within a city, so use this to narrow the list, then tour streets.</li>
+    </ul>
+  </section>
+</div>
+
+
+
+<p class="snap" id="asof">Loading data…</p>
+<p class="snap">Built with Claude. Data and methods: <a href="https://github.com/pinedakevin/Claude_Projects/tree/main/home-decision-studio">github.com/pinedakevin/Claude_Projects</a>. Estimates only, not financial advice.</p>
+</div>
+<script src="vendor/d3.min.js"></script>
+<script>
+window.dash = (() => {
+  const FILES = { home_values: 'data/home_values.csv', rent_listings: 'data/rent_listings.csv', mortgage_inputs: 'data/mortgage_inputs.csv', crime: 'data/crime.csv', schools: 'data/schools.csv', people: 'data/demographics.csv', places: 'data/places.csv', drive_matrix: 'data/drive_matrix.csv' };
+  const DEFAULTS = {"isvet": false, "rating": 0, "ffuse": "first", "loan": "conv", "term": 30, "down": 10, "rate": null, "budget": 4000, "maxdrive": 40, "work": "Salt Lake City", "p2": "", "years": 10, "appr": 4, "rentg": 3, "ret": 7, "closing": 3, "ins": 0.32, "pmi": 0.5, "hoa": 0, "upkeep": 1, "sell": 7, "w_cost": 3, "w_bvr": 2, "w_safety": 3, "w_schools": 3, "w_work": 2, "w_p2": 1, "w_trend": 1, "sel": null, "pins": []};
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const DATA = {}, calcs = {}, memo = {}, subs = [];
+  let P = clone(DEFAULTS), failed = false;
+  const get = (id) => {
+    if (FILES[id]) return DATA[id] ? { status: 'ok', data: DATA[id], columns: DATA[id].columns, meta: [] } : { status: failed ? 'error' : 'loading', data: [], columns: [], meta: [] };
+    if (calcs[id]) {
+      const c = calcs[id], ins = c.inputs.map(get);
+      if (ins.some((x) => x.status !== 'ok')) return { status: 'loading', data: [], columns: [], meta: [] };
+      if (!(id in memo)) memo[id] = c.fn(...ins.map((x) => x.data));
+      return { status: 'ok', data: memo[id], columns: [], meta: [] };
+    }
+    return { status: 'missing', data: [], columns: [], meta: [] };
+  };
+  const run = () => subs.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
+  let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 120); });
+  const bust = '?v=' + Date.now();
+  Promise.all(Object.entries(FILES).map(([k, f]) => d3.csv(f + bust).then((rows) => { DATA[k] = rows; })))
+    .then(run)
+    .catch((e) => { failed = true; console.error(e); const a = document.getElementById('asof'); if (a) a.textContent = 'The data files could not be loaded. Try refreshing the page.'; run(); });
+  fetch('data/meta.json' + bust).then((r) => r.json()).then((m) => {
+    const a = document.getElementById('asof'); if (!a) return;
+    const when = m.refreshed_at ? new Date(m.refreshed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    a.textContent = 'Data last refreshed ' + when + '. ' + Object.entries(m.sources || {}).map(([k, v]) => k + ': ' + v).join(' · ');
+  }).catch(() => {});
+  return {
+    data: get, calc: (id, o) => { calcs[id] = o; }, loader: () => {}, onData: (fn) => { subs.push(fn); fn(); },
+    params: () => clone(P), setParams: (o) => { P = { ...P, ...o }; run(); }, resetParams: () => { P = clone(DEFAULTS); run(); },
+    setLink: (n) => { try { history.replaceState(null, '', '#' + n); } catch (e) {} }, refresh: () => {},
+    colors: ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)', 'var(--s7)', 'var(--s8)'],
+  };
+})();
+</script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const fmt$ = d3.format('$,.0f');
+  const fmtK = (v) => (v < 0 ? '−' : '') + '$' + (Math.abs(v) >= 1e6 ? (Math.abs(v) / 1e6).toFixed(2) + 'M' : Math.round(Math.abs(v) / 1000) + 'k');
+  const sgn$ = (v) => (v >= 0 ? '+' : '−') + fmt$(Math.abs(v));
+  const FACTORS = [
+    { k: 'cost', name: 'Cost', long: 'monthly cost' },
+    { k: 'bvr', name: 'Own vs rent', long: 'owning beating renting' },
+    { k: 'safety', name: 'Safety', long: 'safety' },
+    { k: 'schools', name: 'Schools', long: 'schools' },
+    { k: 'work', name: 'Drive to work', long: 'a short drive to work' },
+    { k: 'p2', name: 'Drive to 2nd place', long: 'a short drive to your second place' },
+    { k: 'trend', name: 'Value trend', long: 'rising home values' },
+  ];
+  FACTORS.forEach((f, i) => { f.c = dash.colors[i]; });
+  const DEF = { isvet: false, rating: 0, ffuse: 'first', loan: 'conv', term: 30, down: 10, rate: null, budget: 4000, maxdrive: 40, work: 'Salt Lake City', p2: '', years: 10, appr: 4, rentg: 3, ret: 7, closing: 3, ins: 0.32, pmi: 0.5, hoa: 0, upkeep: 1, sell: 7, w_cost: 3, w_bvr: 2, w_safety: 3, w_schools: 3, w_work: 2, w_p2: 1, w_trend: 1, sel: null, pins: [] };
+
+  // ---------- static per-city data ----------
+  dash.calc('base', {
+    title: 'City facts and fixed scores',
+    description: 'Joins home values, rents, crime, schools, census figures and map points per city; scales safety, schools and value trend 0–100 within the 20 cities.',
+    inputs: ['home_values', 'rent_listings', 'crime', 'schools', 'people', 'places'],
+    fn: (home_values, rent_listings, crime, schools, people, places) => {
+      const by = (rows, c, key = 'city') => rows.find((r) => r[key] === c) || {};
+      const grade = { 'A+': 4.3, A: 4, 'A-': 3.7, 'B+': 3.3, B: 3, 'B-': 2.7, 'C+': 2.3, C: 2, 'C-': 1.7 };
+      const rows = home_values.map((h) => {
+        const rl = by(rent_listings, h.city), cr = by(crime, h.city), sc = by(schools, h.city), pe = by(people, h.city), g = by(places, h.city, 'place');
+        const n = Number(rl.listings), med = Number(rl.median_rent);
+        const thin = n < 15 && rl.pool_median_rent !== '' && rl.pool_median_rent != null;
+        return {
+          city: h.city, region: h.region, county: h.county, lat: Number(g.lat), lon: Number(g.lon),
+          home: Math.round((Number(h.zhvi_3bd) + Number(h.zhvi_4bd) + Number(h.zhvi_sfr)) / 3),
+          appr1: Number(h.zhvi_sfr) / Number(h.zhvi_sfr_sep2025) - 1,
+          rent: thin ? Math.round((n * med + 8 * Number(rl.pool_median_rent)) / (n + 8)) : med, rent_n: n,
+          v: Number(cr.ns_violent_per_1000), p: Number(cr.ns_property_per_1000), nsi: Number(cr.ns_index),
+          district: sc.district, niche: sc.niche_city_grade, nicheN: grade[sc.niche_city_grade], gs: sc.gs_elem_avg === '' ? null : Number(sc.gs_elem_avg),
+          ela: Number(sc.district_ela_pct), math: Number(sc.district_math_pct), prof: (Number(sc.district_ela_pct) + Number(sc.district_math_pct)) / 2,
+          income: Number(pe.median_hh_income), growth: Number(pe.pop_2025) / Number(pe.pop_2020) - 1, owner: Number(pe.owner_occupied_pct), kids: Number(pe.under18_pct), pop: Number(pe.pop_2025),
+        };
+      });
+      const sc = (key, lower) => { const vals = rows.map((r) => r[key]).filter((x) => x != null && !Number.isNaN(x)); const lo = Math.min(...vals), hi = Math.max(...vals); return (x) => (x == null || Number.isNaN(x) || hi === lo) ? null : (lower ? (hi - x) / (hi - lo) : (x - lo) / (hi - lo)) * 100; };
+      const sV = sc('v', true), sP = sc('p', true), sN = sc('nicheN'), sE = sc('prof'), sG = sc('gs'), sT = sc('appr1');
+      const avg = (a) => { const b = a.filter((x) => x != null); return b.reduce((s, x) => s + x, 0) / b.length; };
+      return rows.map((r) => ({ ...r, s_safety: Math.round(avg([sV(r.v), sP(r.p)])), s_schools: Math.round(avg([sN(r.nicheN), sE(r.prof), sG(r.gs)])), s_trend: Math.round(sT(r.appr1)) }));
+    },
+  });
+
+  // ---------- state ----------
+  const S = () => {
+    const p = { ...DEF, ...dash.params() };
+    ['rating', 'term', 'down', 'budget', 'maxdrive', 'years', 'appr', 'rentg', 'ret', 'closing', 'ins', 'pmi', 'hoa', 'upkeep', 'sell'].forEach((k) => { p[k] = Number(p[k]) || 0; });
+    p.rate = p.rate == null || p.rate === '' ? null : Number(p.rate);
+    FACTORS.forEach((f) => { p['w_' + f.k] = Number(p['w_' + f.k]) || 0; });
+    p.pins = Array.isArray(p.pins) ? p.pins : [];
+    p.isvet = !!p.isvet;
+    if (!p.isvet && p.loan === 'va') p.loan = 'conv';
+    if (p.loan === 'conv' && p.down < 3) p.down = 3;
+    if (p.loan === 'fha' && p.down < 3.5) p.down = 3.5;
+    return p;
+  };
+  const set = (o) => dash.setParams(o);
+  const inputs = () => { const m = dash.data('mortgage_inputs'); if (m.status !== 'ok') return null; const o = {}; m.data.forEach((r) => { o[r.key] = Number(r.value); }); return o; };
+  let DRIVE = null;
+  const driveMin = (city, dest) => { if (!dest || !DRIVE) return null; const v = DRIVE[city + '|' + dest]; return v == null ? null : v; };
+
+  // ---------- the money model ----------
+  function model(c, s, mi) {
+    const P = c.home; let D = P * s.down / 100;
+    const fhaLimit = c.county === 'Utah' ? mi.fha_limit_utah : mi.fha_limit_salt_lake;
+    const fhaBump = s.loan === 'fha' && P - D > fhaLimit ? (P - fhaLimit) - D : 0;
+    D += fhaBump;
+    const dp = D / P * 100;
+    const avgRate = s.loan === 'va' ? (s.term === 15 ? mi.va_rate_15 : mi.va_rate) : s.loan === 'fha' ? (s.term === 15 ? mi.fha_rate_15 : mi.fha_rate) : (s.term === 15 ? mi.conv_rate_15 : mi.conv_rate);
+    const rate = s.rate != null && s.rate > 0 ? s.rate : avgRate;
+    let ffr = 0;
+    if (s.loan === 'va' && s.ffuse !== 'exempt') ffr = dp >= 10 ? 1.25 : dp >= 5 ? 1.5 : (s.ffuse === 'sub' ? 3.3 : 2.15);
+    const isFha = s.loan === 'fha', baseLoan = P - D;
+    let bal = baseLoan * (1 + ffr / 100) * (isFha ? 1 + mi.fha_ufmip / 100 : 1);
+    const ltv = baseLoan / P;
+    const mipR = isFha ? (s.term > 15 ? (ltv > 0.95 ? 0.0055 : 0.005) : (ltv > 0.9 ? 0.004 : 0.0015)) : 0;
+    const mipMonths = isFha ? (ltv <= 0.9 ? 132 : s.term * 12) : 0;
+    const n = s.term * 12, r = rate / 1200;
+    const pi = r === 0 ? bal / n : bal * r / (1 - Math.pow(1 + r, -n));
+    const taxRate = (c.county === 'Utah' ? mi.tax_rate_utah : mi.tax_rate_salt_lake) / 100;
+    const share = mi.residential_share / 100, exempt = s.isvet ? mi.vet_exempt_limit * s.rating / 100 : 0;
+    const taxOf = (V) => Math.max(0, share * V - exempt) * taxRate / share;
+    const insR = s.ins / 100, upR = s.upkeep / 100, g = s.appr / 100, rg = s.rentg / 100, mret = Math.pow(1 + s.ret / 100, 1 / 12) - 1, pmiR = s.pmi / 100;
+    const pmiOn = s.loan === 'conv' && dp < 20;
+    const closing = P * s.closing / 100;
+    const first = { pi, tax: taxOf(P) / 12, ins: P * insR / 12, hoa: s.hoa, pmi: pmiOn ? bal * pmiR / 12 : isFha ? bal * mipR / 12 : 0, upkeep: P * upR / 12, fee: (P - D) * ffr / 100 };
+    first.payment = first.pi + first.tax + first.ins + first.pmi + first.hoa;
+    let ownPort = 0, rentPort = D + closing;
+    const series = [{ y: 0, own: P - bal - P * s.sell / 100, rent: rentPort }];
+    let be = null;
+    for (let m = 1; m <= s.years * 12; m++) {
+      const yr = Math.floor((m - 1) / 12);
+      const V = P * Math.pow(1 + g, yr);
+      const interest = bal * r;
+      const princ = m <= n ? Math.min(pi - interest, bal) : 0;
+      const pmi = pmiOn && bal > 0.8 * P ? bal * pmiR / 12 : isFha && m <= mipMonths ? bal * mipR / 12 : 0;
+      const own = (m <= n && bal > 0 ? pi : 0) + taxOf(V) / 12 + V * insR / 12 + V * upR / 12 + pmi + s.hoa;
+      if (m <= n) bal = Math.max(0, bal - princ);
+      const rent = c.rent * Math.pow(1 + rg, yr);
+      ownPort *= 1 + mret; rentPort *= 1 + mret;
+      if (own > rent) rentPort += own - rent; else ownPort += rent - own;
+      if (m % 12 === 0) {
+        const ownNW = P * Math.pow(1 + g, m / 12) * (1 - s.sell / 100) - bal + ownPort;
+        series.push({ y: m / 12, own: ownNW, rent: rentPort });
+        if (be == null && ownNW >= rentPort) be = m / 12;
+      }
+    }
+    const last = series[series.length - 1];
+    return { rate, avgRate, ffr, fhaBump, mipR, mipMonths, isFha, downUsed: D, first, series, ownNW: last.own, rentNW: last.rent, adv: last.own - last.rent, be, cashIn: D + closing };
+  }
+
+  // ---------- scoring ----------
+  function evaluate(rows, s, mi) {
+    const R = rows.map((c) => ({ c, m: model(c, s, mi), dw: driveMin(c.city, s.work), dp: driveMin(c.city, s.p2) }));
+    const scale = (vals, lower) => { const v = vals.filter((x) => x != null); const lo = Math.min(...v), hi = Math.max(...v); return (x) => x == null ? null : hi === lo ? 50 : (lower ? (hi - x) / (hi - lo) : (x - lo) / (hi - lo)) * 100; };
+    const sCost = scale(R.map((x) => x.m.first.payment), true), sAdv = scale(R.map((x) => x.m.adv)), sW = scale(R.map((x) => x.dw), true), sP2 = scale(R.map((x) => x.dp), true);
+    const w = (k) => (k === 'work' && !s.work) || (k === 'p2' && !s.p2) ? 0 : s['w_' + k];
+    const tw = FACTORS.reduce((t, f) => t + w(f.k), 0) || 1;
+    R.forEach((x) => {
+      x.sc = { cost: sCost(x.m.first.payment), bvr: sAdv(x.m.adv), safety: x.c.s_safety, schools: x.c.s_schools, work: sW(x.dw), p2: sP2(x.dp), trend: x.c.s_trend };
+      x.parts = FACTORS.map((f) => ({ ...f, v: (x.sc[f.k] ?? 0) * w(f.k) / tw }));
+      x.total = x.parts.reduce((t, p) => t + p.v, 0);
+      x.overPay = x.m.first.payment > s.budget; x.overDrive = !!s.work && x.dw != null && x.dw > s.maxdrive;
+      x.fits = !x.overPay && !x.overDrive;
+      x.stretch = !x.fits && x.m.first.payment <= s.budget * 1.1 && (!s.work || x.dw <= s.maxdrive + 10);
+    });
+    R.sort((a, b) => b.total - a.total);
+    R.forEach((x, i) => { x.rank = i + 1; });
+    R.activeW = w;
+    return R;
+  }
+
+  // ---------- small helpers ----------
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const chip = (cls, text) => el('span', 'chip ' + cls, text);
+  const tipOf = (box) => { let t = box.querySelector(':scope > .tip'); if (!t) { t = el('div', 'tip'); t.hidden = true; box.appendChild(t); } return t; };
+  const tline = (k, v) => { const d = el('div', 'l'); d.append(el('span', null, k), el('span', null, v)); return d; };
+  const place = (tip, box, ev) => { const [mx, my] = d3.pointer(ev, box); const tw = tip.offsetWidth, th = tip.offsetHeight; tip.style.left = Math.min(Math.max(0, mx + 14), box.clientWidth - tw) + 'px'; tip.style.top = Math.min(Math.max(0, my - th - 8), Math.max(0, box.clientHeight - th)) + 'px'; };
+  const svgIn = (box, W, H) => { box.querySelectorAll(':scope > svg').forEach((n) => n.remove()); box.style.minHeight = H + 'px'; return d3.select(box).insert('svg', ':first-child').attr('viewBox', `0 0 ${W} ${H}`).attr('width', '100%').style('font-family', 'var(--font-anthropic-sans)').style('font-size', 'var(--cds-font-size-caption)'); };
+  const fitClass = (x) => x.fits ? 'ok' : x.stretch ? 'warn' : 'bad';
+  const fitColor = (x) => x.fits ? 'var(--color-ok)' : x.stretch ? 'var(--color-warn)' : 'var(--color-fg-muted)';
+  const why = (x) => { if (x.fits) return 'Fits your limits'; const a = []; if (x.overPay) a.push(fmt$(x.m.first.payment - S().budget) + ' over budget'); if (x.overDrive) a.push((x.dw - S().maxdrive) + ' min over drive'); return a.join(' · '); };
+
+  // ---------- controls ----------
+  $('c-rating').replaceChildren(...[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((r) => new Option(r ? r + '%' : 'No rating', r)));
+  const segs = [['c-loan', (v) => ({ loan: v })], ['c-term', (v) => ({ term: Number(v) })], ['c-ret', (v) => ({ ret: Number(v) })], ['c-ffuse', (v) => ({ ffuse: v })]];
+  segs.forEach(([id, fn]) => $(id).addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && !b.disabled) set(fn(b.dataset.v)); }));
+  [['c-down', 'down'], ['c-budget', 'budget'], ['c-drive', 'maxdrive'], ['c-years', 'years'], ['c-appr', 'appr'], ['c-rentg', 'rentg'], ['c-upkeep', 'upkeep'], ['c-sell', 'sell'], ['c-closing', 'closing'], ['c-ins', 'ins'], ['c-pmi', 'pmi']].forEach(([id, k]) => $(id).addEventListener('input', (e) => set({ [k]: Number(e.target.value) })));
+  $('c-isvet').addEventListener('change', (e) => { const on = e.target.checked; set(on ? { isvet: true, loan: 'va', down: 0 } : { isvet: false, loan: 'conv', down: Math.max(3, S().down), rating: 0 }); });
+  $('c-rating').addEventListener('change', (e) => set({ rating: Number(e.target.value), ...(Number(e.target.value) > 0 ? { ffuse: 'exempt' } : {}) }));
+  $('c-rate').addEventListener('change', (e) => { const v = parseFloat(String(e.target.value).replace(/[^0-9.]/g, '')); set({ rate: Number.isFinite(v) && v > 0 && v < 20 ? v : null }); });
+  $('c-hoa').addEventListener('change', (e) => { const v = Number(String(e.target.value).replace(/[^0-9.]/g, '')); set({ hoa: Number.isFinite(v) ? v : 0 }); });
+  $('c-work').addEventListener('change', (e) => set({ work: e.target.value }));
+  $('c-p2').addEventListener('change', (e) => set({ p2: e.target.value, ...(e.target.value && S().w_p2 === 0 ? { w_p2: 2 } : {}) }));
+  $('c-reset').addEventListener('click', () => dash.resetParams());
+  let placesFilled = false;
+  function fillPlaces(places) {
+    if (placesFilled || !places) return; placesFilled = true;
+    const cities = places.filter((p) => p.kind === 'city').map((p) => p.place).sort();
+    const dests = places.filter((p) => p.kind !== 'city').map((p) => p.place);
+    const build = (sel, noneLabel) => {
+      sel.replaceChildren(new Option(noneLabel, ''));
+      const g1 = document.createElement('optgroup'); g1.label = 'Major destinations'; dests.forEach((d) => g1.appendChild(new Option(d, d)));
+      const g2 = document.createElement('optgroup'); g2.label = 'City centers'; cities.forEach((d) => g2.appendChild(new Option(d, d)));
+      sel.append(g1, g2);
+    };
+    build($('c-work'), 'Work from home / skip'); build($('c-p2'), 'None');
+  }
+
+  function syncControls(s, R) {
+    const press = (id, v) => $(id).querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(String(b.dataset.v) === String(v))));
+    press('c-loan', s.loan); press('c-term', s.term); press('c-ret', s.ret); press('c-ffuse', s.ffuse);
+    $('c-loan').querySelector('[data-v="va"]').disabled = !s.isvet;
+    $('c-loan').querySelector('[data-v="va"]').title = s.isvet ? '' : 'VA loans are for veterans and service members';
+    $('c-isvet').checked = s.isvet; $('w-rating').hidden = !s.isvet; $('w-ffuse').hidden = !(s.isvet && s.loan === 'va'); $('vet-note').hidden = s.isvet;
+    $('c-rating').value = s.rating;
+    $('c-down').min = s.loan === 'conv' ? 3 : s.loan === 'fha' ? 3.5 : 0;
+    const setR = (id, v) => { if (document.activeElement !== $(id)) $(id).value = v; };
+    setR('c-down', s.down); setR('c-budget', s.budget); setR('c-drive', s.maxdrive); setR('c-years', s.years); setR('c-appr', s.appr); setR('c-rentg', s.rentg); setR('c-upkeep', s.upkeep); setR('c-sell', s.sell); setR('c-closing', s.closing); setR('c-ins', s.ins); setR('c-pmi', s.pmi);
+    setR('c-hoa', d3.format(',')(s.hoa)); setR('c-rate', s.rate != null ? s.rate : ''); setR('c-work', s.work || ''); setR('c-p2', s.p2 || '');
+    $('w-drive').hidden = !s.work;
+    $('o-down').textContent = s.down + '%' + (s.loan === 'conv' && s.down < 20 ? ' · PMI' : s.loan === 'fha' ? ' · MIP' : ''); $('o-budget').textContent = fmt$(s.budget); $('o-drive').textContent = s.maxdrive + ' min';
+    $('o-years').textContent = s.years + (s.years === 1 ? ' year' : ' years'); $('o-appr').textContent = s.appr + '%'; $('o-rentg').textContent = s.rentg + '%';
+    $('o-upkeep').textContent = s.upkeep + '%'; $('o-sell').textContent = s.sell + '%'; $('o-closing').textContent = s.closing + '%'; $('o-ins').textContent = s.ins.toFixed(2) + '%'; $('o-pmi').textContent = s.pmi.toFixed(2) + '%';
+    if (R && R.length) {
+      const m = R[0].m;
+      $('c-rate').placeholder = m.avgRate.toFixed(2) + '% this week';
+      $('o-rate').textContent = (s.rate ? 'Using your rate: ' + s.rate + '%' : 'Rate: ' + m.avgRate.toFixed(2) + '% (' + (s.loan === 'va' ? 'VA' : s.loan === 'fha' ? 'FHA' : 'conventional') + ' ' + s.term + '-yr average, this week)') + (m.ffr ? ' · funding fee ' + m.ffr + '%' : '') + (m.isFha ? ' · 1.75% upfront MIP added to the loan · ' + (m.mipR * 100).toFixed(2) + '% a year ' + (m.mipMonths === 132 ? 'for 11 years' : 'for the life of the loan') : '');
+    }
+    FACTORS.forEach((f) => { if (f.k === 'work') f.prio.querySelector('.nm span').textContent = s.work ? 'Drive to work' : 'Drive to work (off)'; if (f.k === 'p2') f.prio.querySelector('.nm span').textContent = s.p2 ? 'Drive to ' + short(s.p2) : '2nd place (pick one)'; });
+  }
+  const short = (n) => n ? n.replace(/ \(.*\)$/, '') : '';
+
+  // ---------- priorities ----------
+  const prios = $('prios');
+  FACTORS.forEach((f) => {
+    const d = el('div', 'prio'); d.id = 'prio-' + f.k;
+    const nm = el('div', 'nm'); const dot = el('i'); dot.style.background = f.c; nm.append(dot, el('span', null, f.name));
+    const ctl = el('div', 'ctl');
+    const minus = el('button', null, '−'); minus.setAttribute('aria-label', 'Less weight on ' + f.name);
+    const plus = el('button', null, '+'); plus.setAttribute('aria-label', 'More weight on ' + f.name);
+    const pips = el('div', 'pips'); for (let i = 0; i < 5; i++) pips.appendChild(el('span'));
+    minus.addEventListener('click', () => set({ ['w_' + f.k]: Math.max(0, S()['w_' + f.k] - 1) }));
+    plus.addEventListener('click', () => set({ ['w_' + f.k]: Math.min(5, S()['w_' + f.k] + 1) }));
+    pips.addEventListener('click', (e) => { const i = [...pips.children].indexOf(e.target); if (i >= 0) set({ ['w_' + f.k]: S()['w_' + f.k] === i + 1 ? i : i + 1 }); });
+    ctl.append(minus, pips, plus); d.append(nm, ctl); prios.appendChild(d); f.prio = d;
+  });
+  function syncPrios(s) { FACTORS.forEach((f) => { const w = s['w_' + f.k]; f.prio.classList.toggle('off', w === 0); [...f.prio.querySelectorAll('.pips span')].forEach((p, i) => { p.style.background = i < w ? f.c : ''; }); }); }
+
+  // ---------- map ----------
+  function drawMap(R, s, geo) {
+    const box = $('map'); const W = box.clientWidth; if (!W) return;
+    const pts = R.map((x) => x.c);
+    const lat0 = 40.55, kx = Math.cos(lat0 * Math.PI / 180);
+    const chosen = [[s.work, 'work'], [s.p2, 'p2']].filter(([n]) => n).map(([n, kind]) => { const g = geo.find((q) => q.place === n); return g ? { place: n, kind, lat: Number(g.lat), lon: Number(g.lon) } : null; }).filter(Boolean);
+    const onMap = chosen.filter((g) => g.lat > 40.2 && g.lat < 40.85 && g.lon > -112.2 && g.lon < -111.6);
+    const offMap = chosen.filter((g) => !onMap.includes(g));
+    const lons = pts.map((p) => p.lon).concat(onMap.map((g) => g.lon)), lats = pts.map((p) => p.lat).concat(onMap.map((g) => g.lat));
+    const x0 = d3.min(lons) - 0.035, x1 = d3.max(lons) + 0.035, y0 = d3.min(lats) - 0.03, y1 = d3.max(lats) + 0.03;
+    const geoW = (x1 - x0) * kx, geoH = y1 - y0;
+    const H = Math.round(Math.min(W * geoH / geoW, 640));
+    const sc = Math.min(W / geoW, H / geoH);
+    const ox = (W - geoW * sc) / 2, oy = (H - geoH * sc) / 2;
+    const X = (lon) => ox + (lon - x0) * kx * sc, Y = (lat) => oy + (y1 - lat) * sc;
+    const svg = svgIn(box, W, H);
+    svg.append('rect').attr('width', W).attr('height', H).attr('rx', 12).attr('fill', 'var(--color-bg)');
+    // faint graticule
+    const g0 = svg.append('g').attr('stroke', 'var(--cds-chart-grid)').attr('stroke-width', 1);
+    for (let la = Math.ceil(y0 * 20) / 20; la < y1; la += 0.05) g0.append('line').attr('x1', 0).attr('x2', W).attr('y1', Y(la)).attr('y2', Y(la));
+    for (let lo = Math.ceil(x0 * 20) / 20; lo < x1; lo += 0.05) g0.append('line').attr('y1', 0).attr('y2', H).attr('x1', X(lo)).attr('x2', X(lo));
+    // county line band near Point of the Mountain (approx.)
+    svg.append('line').attr('x1', 0).attr('x2', W).attr('y1', Y(40.445)).attr('y2', Y(40.445)).attr('stroke', 'var(--color-fg-muted)').attr('stroke-dasharray', '2 5').attr('opacity', .6);
+    svg.append('text').attr('x', 10).attr('y', Y(40.445) - 6).attr('fill', 'var(--color-fg-muted)').text('Salt Lake County');
+    svg.append('text').attr('x', 10).attr('y', Y(40.445) + 15).attr('fill', 'var(--color-fg-muted)').text('Utah County');
+    // I-15 (approximate)
+    const i15 = [[40.78, -111.905], [40.72, -111.903], [40.66, -111.901], [40.61, -111.899], [40.56, -111.893], [40.52, -111.889], [40.47, -111.903], [40.43, -111.880], [40.39, -111.855], [40.33, -111.790]];
+    svg.append('path').attr('d', d3.line()(i15.map(([la, lo]) => [X(lo), Y(la)]))).attr('fill', 'none').attr('stroke', 'var(--color-border-line)').attr('stroke-width', 5).attr('stroke-linecap', 'round');
+    svg.append('text').attr('x', X(-111.896) + 6).attr('y', Y(40.745)).attr('fill', 'var(--color-fg-muted)').attr('font-size', 10).text('I-15');
+    // landmarks are drawn on top later; reserve their label space first
+    const placed = [];
+    const marks = onMap.map((g) => {
+      const gx = X(g.lon), gy = Y(g.lat), label = g.kind === 'work' ? 'Work' : short(g.place);
+      const w = label.length * 6.2, lx = gx - 12 - w, ly = gy + 20;
+      placed.push([gx - 9, gy - 9, gx + 9, gy + 9], [lx, ly - 7, lx + w, ly + 7]);
+      return { g, gx, gy, label, lx, ly };
+    });
+    // cities
+    const maxT = d3.max(R, (x) => x.total) || 1, minT = d3.min(R, (x) => x.total);
+    const rad = (x) => 5 + 11 * ((x.total - minT) / Math.max(1, maxT - minT));
+    const node = svg.append('g').selectAll('g').data([...R].reverse()).join('g').attr('transform', (x) => `translate(${X(x.c.lon)},${Y(x.c.lat)})`).style('cursor', 'pointer');
+    node.append('circle').attr('r', (x) => rad(x) + 7).attr('fill', 'transparent');
+    node.append('circle').attr('r', rad).attr('fill', (x) => fitColor(x)).attr('fill-opacity', (x) => x.fits ? .85 : x.stretch ? .7 : .35).attr('stroke', (x) => x.c.city === s.sel ? 'var(--color-fg)' : 'var(--color-panel)').attr('stroke-width', (x) => x.c.city === s.sel ? 3 : 1.5);
+    node.filter((x) => s.pins.includes(x.c.city)).append('circle').attr('r', 3).attr('fill', 'var(--color-panel)');
+    // labels with nudging
+    node.append('text').attr('dy', '0.35em').attr('fill', 'var(--color-fg)').attr('font-size', 11).attr('font-weight', (x) => x.rank <= 3 ? 700 : 400)
+      .text((x) => (x.rank <= 3 ? x.rank + '. ' : '') + x.c.city)
+      .each(function (x) {
+        const t = d3.select(this); const r = rad(x); const w = this.getComputedTextLength(); const cx = X(x.c.lon), cy = Y(x.c.lat);
+        const cands = [[r + 4, 0, 'start'], [-r - 4, 0, 'end'], [r + 2, -r - 6, 'start'], [r + 2, r + 8, 'start'], [-r - 2, -r - 6, 'end'], [-r - 2, r + 8, 'end'], [r + 2, -r - 18, 'start'], [r + 2, r + 20, 'start'], [-r - 2, -r - 18, 'end'], [-r - 2, r + 20, 'end']];
+        let pick = cands[0];
+        for (const c of cands) {
+          const bx1 = c[2] === 'start' ? cx + c[0] : cx + c[0] - w, bx2 = bx1 + w, by1 = cy + c[1] - 7, by2 = cy + c[1] + 7;
+          const off = bx1 < 2 || bx2 > W - 2;
+          const hit = placed.some((p) => bx1 < p[2] && bx2 > p[0] && by1 < p[3] && by2 > p[1]);
+          if (!off && !hit) { pick = c; break; }
+        }
+        t.attr('x', pick[0]).attr('y', pick[1]).attr('text-anchor', pick[2]);
+        const bx1 = pick[2] === 'start' ? cx + pick[0] : cx + pick[0] - w; placed.push([bx1, cy + pick[1] - 7, bx1 + w, cy + pick[1] + 7]);
+      });
+    marks.forEach((k) => {
+      const lm = svg.append('g').style('pointer-events', 'none');
+      if (k.g.kind === 'work') lm.append('path').attr('d', d3.symbol(d3.symbolStar, 190)()).attr('transform', `translate(${k.gx},${k.gy})`).attr('fill', 'var(--color-fg)').attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5);
+      else lm.append('path').attr('d', d3.symbol(d3.symbolDiamond, 120)()).attr('transform', `translate(${k.gx},${k.gy})`).attr('fill', 'var(--color-panel)').attr('stroke', 'var(--color-fg)').attr('stroke-width', 2);
+      lm.append('line').attr('x1', k.gx - 6).attr('y1', k.gy + 6).attr('x2', k.lx + k.label.length * 6.2).attr('y2', k.ly - 4).attr('stroke', 'var(--color-fg-muted)');
+      lm.append('text').attr('x', k.lx).attr('y', k.ly).attr('dy', '0.35em').attr('fill', 'var(--color-fg)').attr('font-size', 10).attr('font-weight', 700).text(k.label);
+    });
+    const tip = tipOf(box);
+    node.on('mousemove', (ev, x) => {
+      tip.replaceChildren(el('div', 't', '#' + x.rank + ' ' + x.c.city), tline('Score', Math.round(x.total) + ' / 100'), tline('Payment', fmt$(x.m.first.payment) + '/mo'), tline('Rent', fmt$(x.c.rent) + '/mo'), tline('To work', x.dw == null ? '—' : x.dw + ' min'), tline('Own vs rent, ' + s.years + ' yrs', sgn$(x.m.adv)));
+      tip.hidden = false; place(tip, box, ev);
+    }).on('mouseleave', () => { tip.hidden = true; })
+      .on('click', (ev, x) => { set({ sel: x.c.city }); $('detail').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    const lg = $('map-legend');
+    const li = (col, op, txt) => { const sp = el('span'); const i = el('i'); i.style.background = col; i.style.opacity = op; sp.append(i, document.createTextNode(txt)); return sp; };
+    const extras = [];
+    if (s.work) extras.push(el('span', null, '★ Work: ' + s.work));
+    if (s.p2) extras.push(el('span', null, '◇ ' + s.p2));
+    offMap.forEach((g) => extras.push(el('span', null, g.place + ' is off the map; drive times still count')));
+    lg.replaceChildren(li('var(--color-ok)', .85, 'Fits your limits'), li('var(--color-warn)', .7, 'Just over'), li('var(--color-fg-muted)', .35, 'Over a limit'), ...extras, el('span', null, 'Positions and I-15 are approximate'));
+  }
+
+  // ---------- best match ----------
+  function drawBest(R, s) {
+    const box = $('best'); box.replaceChildren();
+    const fit = R.filter((x) => x.fits);
+    const fitN = fit.length;
+    $('lede-dyn').replaceChildren();
+    if (!fitN) {
+      box.append(el('div', 'eyebrow', 'Best match'), el('h2', null, 'Nothing fits yet'), el('p', 'empty', 'No city is under both your payment limit and your drive limit. Raise the monthly limit, allow a longer drive, or switch the loan or term. The closest is ' + R.slice().sort((a, b) => a.m.first.payment - b.m.first.payment)[0].c.city + ' at ' + fmt$(R.slice().sort((a, b) => a.m.first.payment - b.m.first.payment)[0].m.first.payment) + '/mo.'));
+      $('lede-dyn').append(document.createTextNode('No city fits your limits right now.'));
+      return null;
+    }
+    const b = fit[0];
+    $('lede-dyn').append(document.createTextNode('Right now '), el('b', null, b.c.city), document.createTextNode(' is your best match, and ' + fitN + ' of 20 cities fit your limits.'));
+    const top = el('div', 'top');
+    // score ring
+    const ring = el('div'); ring.style.flex = 'none';
+    const sz = 92, r = 38, C = 2 * Math.PI * r;
+    const rs = d3.select(ring).append('svg').attr('width', sz).attr('height', sz).attr('viewBox', `0 0 ${sz} ${sz}`);
+    rs.append('circle').attr('cx', sz / 2).attr('cy', sz / 2).attr('r', r).attr('fill', 'none').attr('stroke', 'var(--color-border-line)').attr('stroke-width', 8);
+    let off = 0;
+    b.parts.forEach((p) => { const len = C * p.v / 100; if (len <= 0) return; rs.append('circle').attr('cx', sz / 2).attr('cy', sz / 2).attr('r', r).attr('fill', 'none').attr('stroke', p.c).attr('stroke-width', 8).attr('stroke-dasharray', `${len} ${C - len}`).attr('stroke-dashoffset', -off).attr('transform', `rotate(-90 ${sz / 2} ${sz / 2})`); off += len; });
+    rs.append('text').attr('x', sz / 2).attr('y', sz / 2).attr('dy', '0.35em').attr('text-anchor', 'middle').attr('font-family', 'var(--font-anthropic-serif)').attr('font-size', 26).attr('fill', 'var(--color-fg)').text(Math.round(b.total));
+    const nm = el('div'); nm.append(el('div', 'eyebrow', 'Best match · #' + b.rank + ' overall'), el('div', 'name', b.c.city), el('div', 'sub', b.c.region + ' · ' + b.c.district.split(' (')[0] + ' schools'));
+    top.append(ring, nm);
+    const kv = el('dl', 'kv');
+    const add = (k, v, c) => { const dt = el('dt', null, k); const dd = el('dd'); if (c) dd.append(c); else dd.textContent = v; kv.append(dt, dd); };
+    add('Monthly payment', null, (() => { const s1 = el('span'); s1.append(document.createTextNode(fmt$(b.m.first.payment) + ' '), chip('ok', fmt$(s.budget - b.m.first.payment) + ' under')); return s1; })());
+    add('Rent for the same house', fmt$(b.c.rent));
+    add('After ' + s.years + ' yrs, owning vs renting', null, chip(b.m.adv >= 0 ? 'ok' : 'bad', (b.m.adv >= 0 ? 'Own wins by ' : 'Rent wins by ') + fmtK(Math.abs(b.m.adv))));
+    if (s.work) add('Drive to work', b.dw + ' min'); if (s.p2) add('Drive to ' + short(s.p2), b.dp + ' min');
+    add('Safety index (100 = safest)', String(b.c.nsi));
+    add('Schools (Niche city grade)', b.c.niche);
+    const w = el('div', 'why');
+    const active = b.parts.filter((p) => R.activeW(p.k) > 0);
+    const strong = [...active].sort((p, q) => b.sc[q.k] - b.sc[p.k]).slice(0, 2);
+    const weak = [...active].sort((p, q) => b.sc[p.k] - b.sc[q.k])[0];
+    const line1 = el('div'); line1.append(chip('ok', 'Strong'), el('span', null, 'Top marks for ' + strong.map((p) => p.long + ' (' + Math.round(b.sc[p.k]) + ')').join(' and ') + '.'));
+    w.append(line1);
+    if (weak && b.sc[weak.k] < 50) { const l2 = el('div'); l2.append(chip('warn', 'Watch'), el('span', null, 'Weaker on ' + weak.long + ' (' + Math.round(b.sc[weak.k]) + ').')); w.append(l2); }
+    const runner = fit[1]; if (runner) { const l3 = el('div'); l3.append(chip('neu', 'Next'), el('span', null, runner.c.city + ' is close behind at ' + Math.round(runner.total) + (fit[2] ? ', then ' + fit[2].c.city + ' at ' + Math.round(fit[2].total) : '') + '.')); w.append(l3); }
+    const btns = el('div'); btns.style.display = 'flex'; btns.style.gap = '8px'; btns.style.flexWrap = 'wrap';
+    const open = el('button', 'btn primary', 'Open ' + b.c.city); open.addEventListener('click', () => { set({ sel: b.c.city }); $('detail').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    const cmp = el('button', 'btn', 'Compare the top 3'); cmp.addEventListener('click', () => { set({ pins: fit.slice(0, 3).map((x) => x.c.city) }); $('compare').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    btns.append(open, cmp);
+    box.append(top, kv, w, btns);
+    return b;
+  }
+
+  // ---------- ranked list ----------
+  function drawList(R, s) {
+    const list = $('list'); const frag = document.createDocumentFragment();
+    const hd = el('div', 'rowc hd'); ['#', 'City', 'Your score', 'Payment', 'Own vs rent', 'Drive', ''].forEach((t, i) => { const c = el('div', ['', '', '', 'c-pay', 'c-bvr', 'c-drv', ''][i], t); hd.append(c); }); frag.append(hd);
+    R.forEach((x) => {
+      const row = el('div', 'rowc' + (x.c.city === s.sel ? ' sel' : '') + (x.fits ? '' : ' out')); row.tabIndex = 0; row.setAttribute('role', 'button'); row.setAttribute('aria-label', 'Open ' + x.c.city);
+      const sb = el('div', 'sbar'); const tr = el('div', 'track'); x.parts.forEach((p) => { const i = el('i'); i.style.width = p.v + '%'; i.style.background = p.c; tr.appendChild(i); }); sb.append(tr, el('b', null, String(Math.round(x.total))));
+      const cn = el('div', 'cn', x.c.city); cn.append(el('small', null, x.fits ? (x.m.fhaBump > 0 ? 'Needs ' + fmtK(x.m.fhaBump) + ' more down (FHA limit)' : x.c.region) : why(x)));
+      const pay = el('div', 'cell c-pay'); pay.append(el('strong', null, fmt$(x.m.first.payment)), chip(fitClass(x), x.overPay ? 'over' : x.m.first.payment > s.budget * 0.9 ? 'tight' : 'fits'));
+      const bvr = el('div', 'cell c-bvr'); bvr.append(el('strong', null, (x.m.adv >= 0 ? 'Own ' : 'Rent ') + '+' + fmtK(Math.abs(x.m.adv)).replace('−', '')), el('span', null, x.m.be ? 'even by yr ' + x.m.be : 'renting ahead all ' + s.years + ' yrs'));
+      const drv = el('div', 'cell c-drv'); drv.append(el('strong', null, x.dw == null ? '—' : x.dw + ' min'), el('span', null, s.p2 ? x.dp + ' to ' + short(s.p2) : (s.work ? 'to work' : '')));
+      const pin = el('button', 'pin', s.pins.includes(x.c.city) ? '✓' : '+'); pin.setAttribute('aria-pressed', String(s.pins.includes(x.c.city))); pin.setAttribute('aria-label', 'Pin ' + x.c.city + ' to compare');
+      pin.addEventListener('click', (e) => { e.stopPropagation(); const p = S().pins.slice(); const i = p.indexOf(x.c.city); if (i >= 0) p.splice(i, 1); else { if (p.length >= 3) p.shift(); p.push(x.c.city); } set({ pins: p }); });
+      row.append(el('div', 'rk', String(x.rank)), cn, sb, pay, bvr, drv, pin);
+      const open = () => set({ sel: x.c.city });
+      row.addEventListener('click', open); row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+      frag.append(row);
+    });
+    list.replaceChildren(frag);
+    const n = R.filter((x) => x.fits).length;
+    $('fit-count').textContent = n + ' of 20 fit your limits';
+  }
+
+  // ---------- detail ----------
+  function drawDetail(R, s, best) {
+    const box = $('detail'); box.replaceChildren();
+    const x = R.find((r) => r.c.city === s.sel) || best || R[0]; const c = x.c, m = x.m;
+    const head = el('div', 'head'); const hl = el('div'); hl.append(el('div', 'eyebrow', '#' + x.rank + ' for you · ' + c.region), el('h2', null, c.city));
+    const hr = el('div'); hr.style.display = 'flex'; hr.style.gap = '6px'; hr.style.alignItems = 'center'; hr.append(chip(fitClass(x), why(x)));
+    const pinB = el('button', 'btn', s.pins.includes(c.city) ? 'Unpin' : 'Pin to compare'); pinB.addEventListener('click', () => { const p = S().pins.slice(); const i = p.indexOf(c.city); if (i >= 0) p.splice(i, 1); else { if (p.length >= 3) p.shift(); p.push(c.city); } set({ pins: p }); }); hr.append(pinB);
+    head.append(hl, hr); box.append(head);
+    const tiles = el('div', 'tiles');
+    const tile = (k, v, d) => { const t = el('div', 'tile'); t.append(el('div', 'k', k), el('div', 'v', v), el('div', 'd', d)); tiles.append(t); };
+    tile('Typical 3–4 bed home', fmt$(c.home), (c.appr1 >= 0 ? '+' : '') + (c.appr1 * 100).toFixed(1) + '% in the last year');
+    tile('Your monthly payment', fmt$(m.first.payment), m.rate.toFixed(2) + '% · ' + s.term + '-yr · ' + (s.loan === 'va' ? 'VA' : s.loan === 'fha' ? 'FHA' : 'conv.') + ', ' + (m.downUsed / c.home * 100).toFixed(1).replace(/\.0$/, '') + '% down' + (m.fhaBump > 0 ? ' (raised to meet the FHA limit)' : ''));
+    tile('Rent for the same house', fmt$(c.rent), 'median of ' + c.rent_n + ' house listings');
+    tile('After ' + s.years + (s.years === 1 ? ' year' : ' years'), (m.adv >= 0 ? 'Own +' : 'Rent +') + fmtK(Math.abs(m.adv)).replace('−', ''), m.be ? 'owning pulls ahead in year ' + m.be : 'renting stays ahead the whole time');
+    tile('Drive to work', x.dw == null ? '—' : x.dw + ' min', s.p2 ? x.dp + ' min to ' + short(s.p2) : (s.work ? 'to ' + s.work + ', no traffic' : 'no workplace picked'));
+    tile('Safety index', String(c.nsi), c.v.toFixed(2) + ' violent · ' + c.p.toFixed(1) + ' property per 1,000');
+    box.append(tiles);
+    const split = el('div', 'split');
+    const left = el('div'); left.append(el('h3', null, 'Net worth: owning vs renting'), el('p', 'note', 'What you\'d walk away with each year if you sold (owner) or kept renting and investing the difference (renter).'));
+    const nw = el('div', 'chartbox'); nw.id = 'nw-chart'; left.append(nw);
+    const right = el('div'); right.append(el('h3', null, 'How it scores'), el('p', 'note', 'This city\'s 0–100 score on each factor. The tick marks the middle of the 20 cities.'));
+    const fb = el('div', 'chartbox'); fb.id = 'factor-chart'; right.append(fb);
+    right.append(el('h3', null, 'Where the payment goes'));
+    const pb = el('div', 'chartbox'); pb.id = 'pay-chart'; right.append(pb);
+    split.append(left, right); box.append(split);
+    const facts = el('div', 'facts');
+    const f = (k, v) => { const d = el('div'); d.append(el('span', null, k), el('span', null, v)); facts.append(d); };
+    f('School district', c.district); f('Niche city schools', c.niche); f('GreatSchools elementary avg', c.gs != null ? c.gs.toFixed(1) + ' / 10' : 'not listed');
+    f('District proficiency (English / math)', c.ela.toFixed(0) + '% / ' + c.math.toFixed(0) + '%'); f('Median household income', fmt$(c.income)); f('Population change since 2020', (c.growth >= 0 ? '+' : '') + (c.growth * 100).toFixed(1) + '%');
+    f('Own their home', c.owner.toFixed(0) + '%'); f('Residents under 18', c.kids.toFixed(0) + '%'); f('Cash in at closing', fmt$(m.cashIn));
+    box.append(facts);
+    drawNW(nw, m, s); drawFactors(fb, x, R, s); drawPay(pb, m, c);
+  }
+  function drawNW(box, m, s) {
+    const W = box.clientWidth || 600, H = Math.max(230, Math.min(300, W * 0.52)), mg = { t: 14, r: 64, b: 26, l: 54 };
+    const svg = svgIn(box, W, H);
+    const ser = m.series;
+    const x = d3.scaleLinear([0, s.years], [mg.l, W - mg.r]);
+    const ext = d3.extent(ser.flatMap((d) => [d.own, d.rent]).concat([0]));
+    const y = d3.scaleLinear(ext, [H - mg.b, mg.t]).nice();
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', mg.l).attr('x2', W - mg.r).attr('y1', (d) => y(d)).attr('y2', (d) => y(d)).attr('stroke', (d) => d === 0 ? 'var(--color-fg-muted)' : 'var(--cds-chart-grid)');
+    svg.append('g').selectAll('text').data(y.ticks(5)).join('text').attr('x', mg.l - 8).attr('y', (d) => y(d)).attr('dy', '0.32em').attr('text-anchor', 'end').attr('fill', 'var(--color-fg-muted)').text((d) => fmtK(d));
+    const xt = x.ticks(Math.min(s.years, Math.max(2, Math.floor((W - mg.l - mg.r) / 60)))).filter((t) => Number.isInteger(t));
+    svg.append('g').selectAll('text').data(xt).join('text').attr('x', (d) => x(d)).attr('y', H - 6).attr('text-anchor', 'middle').attr('fill', 'var(--color-fg-muted)').text((d) => 'Yr ' + d);
+    const ownC = dash.colors[0], rentC = dash.colors[2];
+    const area = d3.area().x((d) => x(d.y)).y0((d) => y(d.rent)).y1((d) => y(d.own));
+    svg.append('path').attr('d', area(ser)).attr('fill', m.adv >= 0 ? ownC : rentC).attr('opacity', .12);
+    const ln = (k) => d3.line().x((d) => x(d.y)).y((d) => y(d[k]));
+    svg.append('path').attr('d', ln('rent')(ser)).attr('fill', 'none').attr('stroke', rentC).attr('stroke-width', 2.5).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    svg.append('path').attr('d', ln('own')(ser)).attr('fill', 'none').attr('stroke', ownC).attr('stroke-width', 2.5).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    const last = ser[ser.length - 1];
+    let ly1 = y(last.own), ly2 = y(last.rent); if (Math.abs(ly1 - ly2) < 14) { if (ly1 < ly2) { ly1 -= 7; ly2 += 7; } else { ly1 += 7; ly2 -= 7; } }
+    svg.append('text').attr('x', W - mg.r + 6).attr('y', ly1).attr('dy', '0.35em').attr('fill', ownC).attr('font-weight', 600).text('Own ' + fmtK(last.own));
+    svg.append('text').attr('x', W - mg.r + 6).attr('y', ly2).attr('dy', '0.35em').attr('fill', rentC).attr('font-weight', 600).text('Rent ' + fmtK(last.rent));
+    if (m.be) { const bx = x(m.be); svg.append('line').attr('x1', bx).attr('x2', bx).attr('y1', mg.t).attr('y2', H - mg.b).attr('stroke', 'var(--color-fg)').attr('stroke-dasharray', '3 3'); svg.append('text').attr('x', bx + 4).attr('y', mg.t + 10).attr('fill', 'var(--color-fg)').text('Owning pulls ahead'); }
+    const hov = svg.append('line').attr('y1', mg.t).attr('y2', H - mg.b).attr('stroke', 'var(--color-fg-muted)').attr('opacity', 0);
+    const tip = tipOf(box);
+    svg.append('rect').attr('x', mg.l).attr('y', mg.t).attr('width', W - mg.l - mg.r).attr('height', H - mg.t - mg.b).attr('fill', 'transparent')
+      .on('mousemove', (ev) => { const [px] = d3.pointer(ev); const yr = Math.max(0, Math.min(s.years, Math.round(x.invert(px)))); const d = ser[yr]; if (!d) return; hov.attr('x1', x(yr)).attr('x2', x(yr)).attr('opacity', .6); tip.replaceChildren(el('div', 't', 'Year ' + yr), tline('Owning', fmt$(d.own)), tline('Renting', fmt$(d.rent)), tline('Difference', sgn$(d.own - d.rent))); tip.hidden = false; place(tip, box, ev); })
+      .on('mouseleave', () => { tip.hidden = true; hov.attr('opacity', 0); });
+  }
+  function drawFactors(box, x, R, s) {
+    const W = box.clientWidth || 400, rowH = 26, H = FACTORS.length * rowH + 6;
+    const svg = svgIn(box, W, H);
+    const mt = svg.append('text').attr('visibility', 'hidden'); const lw = d3.max(FACTORS, (f) => { mt.text(f.name); return mt.node().getComputedTextLength(); }); mt.remove();
+    const xs = d3.scaleLinear([0, 100], [lw + 12, W - 34]);
+    FACTORS.forEach((f, i) => {
+      const yy = 3 + i * rowH, v = x.sc[f.k] ?? 0, med = d3.median(R, (r) => r.sc[f.k]);
+      const g = svg.append('g').attr('opacity', R.activeW(f.k) === 0 ? 0.4 : 1);
+      g.append('text').attr('x', lw + 4).attr('y', yy + rowH / 2).attr('dy', '0.35em').attr('text-anchor', 'end').attr('fill', 'var(--color-fg)').text(f.name);
+      g.append('rect').attr('x', xs(0)).attr('y', yy + 6).attr('width', xs(100) - xs(0)).attr('height', rowH - 12).attr('rx', 4).attr('fill', 'var(--color-border-line)');
+      g.append('rect').attr('x', xs(0)).attr('y', yy + 6).attr('width', Math.max(0, xs(v) - xs(0))).attr('height', rowH - 12).attr('rx', 4).attr('fill', f.c);
+      g.append('line').attr('x1', xs(med)).attr('x2', xs(med)).attr('y1', yy + 3).attr('y2', yy + rowH - 3).attr('stroke', 'var(--color-fg)').attr('stroke-width', 2);
+      g.append('text').attr('x', xs(100) + 6).attr('y', yy + rowH / 2).attr('dy', '0.35em').attr('fill', 'var(--color-fg-muted)').text(Math.round(v));
+    });
+  }
+  function drawPay(box, m, c) {
+    const W = box.clientWidth || 400, H = 74;
+    const svg = svgIn(box, W, H);
+    const parts = [['Principal & interest', m.first.pi, dash.colors[0]], ['Property tax', m.first.tax, dash.colors[1]], ['Insurance', m.first.ins, dash.colors[2]], [m.isFha ? 'FHA mortgage insurance' : 'PMI', m.first.pmi, dash.colors[3]], ['Upkeep (not in payment)', m.first.upkeep, 'var(--color-fg-muted)']].filter((p) => p[1] > 0.5);
+    const total = parts.reduce((t, p) => t + p[1], 0);
+    const xs = d3.scaleLinear([0, Math.max(total, c.rent) * 1.02], [0, W]);
+    let acc = 0;
+    parts.forEach((p) => { svg.append('rect').attr('x', xs(acc)).attr('y', 10).attr('width', Math.max(0, xs(acc + p[1]) - xs(acc) - 1)).attr('height', 18).attr('rx', 3).attr('fill', p[2]).attr('opacity', p[0].startsWith('Upkeep') ? .45 : 1); acc += p[1]; });
+    svg.append('line').attr('x1', xs(c.rent)).attr('x2', xs(c.rent)).attr('y1', 4).attr('y2', 34).attr('stroke', 'var(--color-fg)').attr('stroke-width', 3).attr('stroke-linecap', 'round');
+    svg.append('text').attr('x', Math.min(xs(c.rent), W - 4)).attr('y', 48).attr('text-anchor', xs(c.rent) > W - 80 ? 'end' : 'middle').attr('fill', 'var(--color-fg)').attr('font-weight', 600).text('Rent ' + fmt$(c.rent));
+    const lg = el('div', 'legend'); parts.forEach((p) => { const sp = el('span'); const i = el('i'); i.style.background = p[2]; i.style.borderRadius = '2px'; sp.append(i, document.createTextNode(p[0] + ' ' + fmt$(p[1]))); lg.append(sp); });
+    box.querySelectorAll('.legend').forEach((n) => n.remove()); box.appendChild(lg);
+  }
+
+  // ---------- compare ----------
+  function drawCompare(R, s) {
+    let picks = s.pins.map((n) => R.find((x) => x.c.city === n)).filter(Boolean);
+    const auto = !picks.length;
+    if (auto) picks = (R.filter((x) => x.fits).length >= 3 ? R.filter((x) => x.fits) : R).slice(0, 3);
+    $('cmp-note').textContent = auto ? 'Showing your top three. Use + in the list to pin your own.' : 'Your pinned cities. Use ✓ in the list to unpin.';
+    const cols = [dash.colors[0], dash.colors[4], dash.colors[2]];
+    // radar
+    const box = $('radar'); const W = box.clientWidth || 360, H = Math.min(380, Math.max(280, W * 0.9));
+    const svg = svgIn(box, W, H); const cx = W / 2, cy = H / 2 + 4, R0 = Math.min(W, H) / 2 - 52;
+    const ang = (i) => -Math.PI / 2 + i * 2 * Math.PI / FACTORS.length;
+    [25, 50, 75, 100].forEach((v) => svg.append('polygon').attr('points', FACTORS.map((f, i) => [cx + Math.cos(ang(i)) * R0 * v / 100, cy + Math.sin(ang(i)) * R0 * v / 100].join(',')).join(' ')).attr('fill', 'none').attr('stroke', 'var(--cds-chart-grid)'));
+    FACTORS.forEach((f, i) => {
+      svg.append('line').attr('x1', cx).attr('y1', cy).attr('x2', cx + Math.cos(ang(i)) * R0).attr('y2', cy + Math.sin(ang(i)) * R0).attr('stroke', 'var(--cds-chart-grid)');
+      const lx = cx + Math.cos(ang(i)) * (R0 + 14), ly = cy + Math.sin(ang(i)) * (R0 + 14);
+      svg.append('text').attr('x', lx).attr('y', ly).attr('dy', '0.35em').attr('text-anchor', Math.abs(Math.cos(ang(i))) < 0.2 ? 'middle' : Math.cos(ang(i)) > 0 ? 'start' : 'end').attr('fill', R.activeW(f.k) ? 'var(--color-fg)' : 'var(--color-fg-muted)').attr('font-size', 11).text(f.name);
+    });
+    picks.forEach((x, j) => {
+      const pts = FACTORS.map((f, i) => [cx + Math.cos(ang(i)) * R0 * (x.sc[f.k] ?? 0) / 100, cy + Math.sin(ang(i)) * R0 * (x.sc[f.k] ?? 0) / 100]);
+      svg.append('polygon').attr('points', pts.map((p) => p.join(',')).join(' ')).attr('fill', cols[j]).attr('fill-opacity', .12).attr('stroke', cols[j]).attr('stroke-width', 2.2).attr('stroke-linejoin', 'round');
+      pts.forEach((p) => svg.append('circle').attr('cx', p[0]).attr('cy', p[1]).attr('r', 3).attr('fill', cols[j]));
+    });
+    // table
+    const t = $('cmp-table'); t.replaceChildren();
+    const thead = el('thead'); const hr = el('tr'); hr.append(el('th', null, ''));
+    picks.forEach((x, j) => { const th = el('th'); const i = el('i'); i.style.background = cols[j]; th.append(i, document.createTextNode(x.c.city)); hr.append(th); }); thead.append(hr); t.append(thead);
+    const tb = el('tbody');
+    const rows = [
+      ['Your score', (x) => Math.round(x.total), 'max', (v) => String(v)],
+      ['Monthly payment', (x) => x.m.first.payment, 'min', fmt$],
+      ['Rent, same house', (x) => x.c.rent, 'min', fmt$],
+      ['Own vs rent after ' + s.years + ' yrs', (x) => x.m.adv, 'max', (v) => sgn$(v)],
+      ['Owning pulls ahead', (x) => x.m.be ?? 99, 'min', (v) => v === 99 ? 'not within ' + s.years + ' yrs' : 'year ' + v],
+      ['Drive to work', (x) => x.dw ?? 999, 'min', (v) => v === 999 ? '—' : v + ' min'],
+      ['Drive to ' + (short(s.p2) || '2nd place'), (x) => x.dp ?? 999, 'min', (v) => v === 999 ? '—' : v + ' min'],
+      ['Violent crime / 1,000', (x) => x.c.v, 'min', (v) => v.toFixed(2)],
+      ['Property crime / 1,000', (x) => x.c.p, 'min', (v) => v.toFixed(1)],
+      ['Niche city schools', (x) => x.c.nicheN, 'max', (v, x) => x.c.niche],
+      ['GreatSchools elem. avg', (x) => x.c.gs ?? -1, 'max', (v) => v < 0 ? '—' : v.toFixed(1)],
+      ['District', (x) => x.c.district.split(' (')[0], null, (v) => v],
+      ['Typical home', (x) => x.c.home, null, fmt$],
+      ['1-yr value change', (x) => x.c.appr1, 'max', (v) => (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%'],
+      ['Median household income', (x) => x.c.income, null, fmt$],
+    ];
+    rows.forEach(([label, get, best, f]) => {
+      const tr = el('tr'); tr.append(el('td', null, label));
+      const vals = picks.map(get); const target = best === 'max' ? Math.max(...vals) : best === 'min' ? Math.min(...vals) : null;
+      picks.forEach((x, j) => { const td = el('td', picks.length > 1 && target != null && vals[j] === target ? 'win' : null, f(vals[j], x)); tr.append(td); });
+      tb.append(tr);
+    });
+    t.append(tb);
+  }
+
+  // ---------- draw all ----------
+  function draw() {
+    const base = dash.data('base'), geo = dash.data('places'), dm = dash.data('drive_matrix'), mi = inputs();
+    const s = S();
+    syncPrios(s);
+    if (geo.status === 'ok') fillPlaces(geo.data);
+    if (base.status !== 'ok' || geo.status !== 'ok' || dm.status !== 'ok' || !mi) { syncControls(s, null); return; }
+    if (!DRIVE) { DRIVE = {}; dm.data.forEach((r) => { DRIVE[r.home_city + '|' + r.destination] = Number(r.minutes); }); }
+    const R = evaluate(base.data, s, mi);
+    syncControls(s, R);
+    const fitTop = R.find((x) => x.fits);
+    if (!s.sel || !R.some((x) => x.c.city === s.sel)) s.sel = (fitTop || R[0]).c.city;
+    const best = drawBest(R, s);
+    drawMap(R, s, geo.data);
+    drawList(R, s);
+    drawDetail(R, s, best);
+    drawCompare(R, s);
+  }
+  dash.onData(draw);
+})();
+</script>
+</body>
+</html>

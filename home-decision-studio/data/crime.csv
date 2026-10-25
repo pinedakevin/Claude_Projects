@@ -1,0 +1,21 @@
+city,ns_violent_per_1000,ns_property_per_1000,ns_index,fbi_violent_per_1000,fbi_property_per_1000,fbi_agency,fbi_note
+Salt Lake City,8.61,53.85,1,8.63,47.71,Salt Lake City PD,
+West Valley City,4.55,19.35,12,3.84,16.63,West Valley City PD,
+Taylorsville,1.68,19.75,15,1.87,17.40,Taylorsville PD,
+Kearns,2.54,18.63,15,1.79,14.05,Unified Police,Combined figure for all Unified Police areas
+Magna,2.26,16.35,19,1.79,14.05,Unified Police,Combined figure for all Unified Police areas
+Murray,2.74,33.83,4,1.65,28.23,Murray PD,
+West Jordan,2.91,14.96,20,3.13,13.10,West Jordan PD,
+South Jordan,1.21,10.40,34,1.13,9.44,South Jordan PD,
+Riverton,0.73,10.26,36,0.62,7.16,Riverton PD,
+Herriman,1.19,7.54,45,0.64,5.05,Herriman PD,
+Sandy,1.65,22.58,12,2.21,18.05,Sandy PD,
+Draper,1.71,12.36,27,1.92,10.66,Draper PD,
+Millcreek,2.01,19.00,15,1.79,14.05,Unified Police,Combined figure for all Unified Police areas
+Holladay,1.50,13.24,26,1.79,14.05,Unified Police,Combined figure for all Unified Police areas
+Cottonwood Heights,0.92,17.45,19,0.71,15.54,Cottonwood Heights PD,
+Midvale,2.93,32.88,5,1.79,14.05,Unified Police,Combined figure for all Unified Police areas
+Bluffdale,1.91,6.76,46,1.91,7.17,Bluffdale (Saratoga Springs PD contract),
+Lehi,0.90,5.51,57,1.10,4.16,Lehi PD,
+Saratoga Springs,0.92,5.85,55,0.77,4.52,Saratoga Springs PD,
+Eagle Mountain,0.45,2.71,80,1.47,2.15,Utah County Sheriff,Combined figure for the sheriff's whole service area

@@ -1,0 +1,561 @@
+home_city,destination,minutes
+Salt Lake City,"Salt Lake City",0
+Salt Lake City,"West Valley City",21
+Salt Lake City,"Taylorsville",15
+Salt Lake City,"Kearns",23
+Salt Lake City,"Magna",24
+Salt Lake City,"Murray",15
+Salt Lake City,"West Jordan",22
+Salt Lake City,"South Jordan",24
+Salt Lake City,"Riverton",28
+Salt Lake City,"Herriman",37
+Salt Lake City,"Sandy",28
+Salt Lake City,"Draper",27
+Salt Lake City,"Millcreek",14
+Salt Lake City,"Holladay",20
+Salt Lake City,"Cottonwood Heights",24
+Salt Lake City,"Midvale",19
+Salt Lake City,"Bluffdale",30
+Salt Lake City,"Lehi",38
+Salt Lake City,"Saratoga Springs",45
+Salt Lake City,"Eagle Mountain",57
+Salt Lake City,"University of Utah",12
+Salt Lake City,"SLC International Airport",17
+Salt Lake City,"Silicon Slopes (Lehi, Thanksgiving Point)",32
+Salt Lake City,"Provo / BYU",58
+Salt Lake City,"Hill Air Force Base",39
+Salt Lake City,"SLC VA Medical Center",8
+Salt Lake City,"Intermountain Medical Center (Murray)",16
+Salt Lake City,"Zions Technology Center (Midvale)",21
+West Valley City,"Salt Lake City",19
+West Valley City,"West Valley City",0
+West Valley City,"Taylorsville",10
+West Valley City,"Kearns",8
+West Valley City,"Magna",14
+West Valley City,"Murray",16
+West Valley City,"West Jordan",15
+West Valley City,"South Jordan",19
+West Valley City,"Riverton",23
+West Valley City,"Herriman",24
+West Valley City,"Sandy",26
+West Valley City,"Draper",26
+West Valley City,"Millcreek",15
+West Valley City,"Holladay",22
+West Valley City,"Cottonwood Heights",22
+West Valley City,"Midvale",18
+West Valley City,"Bluffdale",23
+West Valley City,"Lehi",38
+West Valley City,"Saratoga Springs",42
+West Valley City,"Eagle Mountain",52
+West Valley City,"University of Utah",29
+West Valley City,"SLC International Airport",17
+West Valley City,"Silicon Slopes (Lehi, Thanksgiving Point)",32
+West Valley City,"Provo / BYU",57
+West Valley City,"Hill Air Force Base",47
+West Valley City,"SLC VA Medical Center",25
+West Valley City,"Intermountain Medical Center (Murray)",17
+West Valley City,"Zions Technology Center (Midvale)",21
+Taylorsville,"Salt Lake City",13
+Taylorsville,"West Valley City",10
+Taylorsville,"Taylorsville",0
+Taylorsville,"Kearns",8
+Taylorsville,"Magna",20
+Taylorsville,"Murray",6
+Taylorsville,"West Jordan",8
+Taylorsville,"South Jordan",14
+Taylorsville,"Riverton",18
+Taylorsville,"Herriman",23
+Taylorsville,"Sandy",19
+Taylorsville,"Draper",19
+Taylorsville,"Millcreek",8
+Taylorsville,"Holladay",12
+Taylorsville,"Cottonwood Heights",15
+Taylorsville,"Midvale",11
+Taylorsville,"Bluffdale",22
+Taylorsville,"Lehi",30
+Taylorsville,"Saratoga Springs",37
+Taylorsville,"Eagle Mountain",49
+Taylorsville,"University of Utah",24
+Taylorsville,"SLC International Airport",19
+Taylorsville,"Silicon Slopes (Lehi, Thanksgiving Point)",25
+Taylorsville,"Provo / BYU",50
+Taylorsville,"Hill Air Force Base",44
+Taylorsville,"SLC VA Medical Center",20
+Taylorsville,"Intermountain Medical Center (Murray)",8
+Taylorsville,"Zions Technology Center (Midvale)",13
+Kearns,"Salt Lake City",21
+Kearns,"West Valley City",8
+Kearns,"Taylorsville",8
+Kearns,"Kearns",0
+Kearns,"Magna",18
+Kearns,"Murray",14
+Kearns,"West Jordan",12
+Kearns,"South Jordan",16
+Kearns,"Riverton",20
+Kearns,"Herriman",21
+Kearns,"Sandy",23
+Kearns,"Draper",24
+Kearns,"Millcreek",16
+Kearns,"Holladay",20
+Kearns,"Cottonwood Heights",20
+Kearns,"Midvale",15
+Kearns,"Bluffdale",20
+Kearns,"Lehi",35
+Kearns,"Saratoga Springs",38
+Kearns,"Eagle Mountain",48
+Kearns,"University of Utah",32
+Kearns,"SLC International Airport",20
+Kearns,"Silicon Slopes (Lehi, Thanksgiving Point)",30
+Kearns,"Provo / BYU",55
+Kearns,"Hill Air Force Base",49
+Kearns,"SLC VA Medical Center",28
+Kearns,"Intermountain Medical Center (Murray)",13
+Kearns,"Zions Technology Center (Midvale)",18
+Magna,"Salt Lake City",22
+Magna,"West Valley City",14
+Magna,"Taylorsville",19
+Magna,"Kearns",18
+Magna,"Magna",0
+Magna,"Murray",22
+Magna,"West Jordan",23
+Magna,"South Jordan",29
+Magna,"Riverton",30
+Magna,"Herriman",26
+Magna,"Sandy",33
+Magna,"Draper",34
+Magna,"Millcreek",22
+Magna,"Holladay",28
+Magna,"Cottonwood Heights",30
+Magna,"Midvale",25
+Magna,"Bluffdale",32
+Magna,"Lehi",45
+Magna,"Saratoga Springs",46
+Magna,"Eagle Mountain",55
+Magna,"University of Utah",33
+Magna,"SLC International Airport",21
+Magna,"Silicon Slopes (Lehi, Thanksgiving Point)",40
+Magna,"Provo / BYU",65
+Magna,"Hill Air Force Base",51
+Magna,"SLC VA Medical Center",28
+Magna,"Intermountain Medical Center (Murray)",24
+Magna,"Zions Technology Center (Midvale)",28
+Murray,"Salt Lake City",12
+Murray,"West Valley City",16
+Murray,"Taylorsville",6
+Murray,"Kearns",14
+Murray,"Magna",22
+Murray,"Murray",0
+Murray,"West Jordan",12
+Murray,"South Jordan",15
+Murray,"Riverton",18
+Murray,"Herriman",28
+Murray,"Sandy",17
+Murray,"Draper",17
+Murray,"Millcreek",4
+Murray,"Holladay",9
+Murray,"Cottonwood Heights",13
+Murray,"Midvale",9
+Murray,"Bluffdale",21
+Murray,"Lehi",29
+Murray,"Saratoga Springs",36
+Murray,"Eagle Mountain",48
+Murray,"University of Utah",23
+Murray,"SLC International Airport",21
+Murray,"Silicon Slopes (Lehi, Thanksgiving Point)",23
+Murray,"Provo / BYU",48
+Murray,"Hill Air Force Base",43
+Murray,"SLC VA Medical Center",19
+Murray,"Intermountain Medical Center (Murray)",3
+Murray,"Zions Technology Center (Midvale)",12
+West Jordan,"Salt Lake City",20
+West Jordan,"West Valley City",15
+West Jordan,"Taylorsville",8
+West Jordan,"Kearns",12
+West Jordan,"Magna",25
+West Jordan,"Murray",12
+West Jordan,"West Jordan",0
+West Jordan,"South Jordan",7
+West Jordan,"Riverton",11
+West Jordan,"Herriman",19
+West Jordan,"Sandy",17
+West Jordan,"Draper",16
+West Jordan,"Millcreek",15
+West Jordan,"Holladay",19
+West Jordan,"Cottonwood Heights",16
+West Jordan,"Midvale",5
+West Jordan,"Bluffdale",16
+West Jordan,"Lehi",27
+West Jordan,"Saratoga Springs",34
+West Jordan,"Eagle Mountain",44
+West Jordan,"University of Utah",30
+West Jordan,"SLC International Airport",25
+West Jordan,"Silicon Slopes (Lehi, Thanksgiving Point)",22
+West Jordan,"Provo / BYU",47
+West Jordan,"Hill Air Force Base",49
+West Jordan,"SLC VA Medical Center",26
+West Jordan,"Intermountain Medical Center (Murray)",12
+West Jordan,"Zions Technology Center (Midvale)",10
+South Jordan,"Salt Lake City",21
+South Jordan,"West Valley City",20
+South Jordan,"Taylorsville",15
+South Jordan,"Kearns",17
+South Jordan,"Magna",30
+South Jordan,"Murray",14
+South Jordan,"West Jordan",8
+South Jordan,"South Jordan",0
+South Jordan,"Riverton",6
+South Jordan,"Herriman",16
+South Jordan,"Sandy",11
+South Jordan,"Draper",10
+South Jordan,"Millcreek",17
+South Jordan,"Holladay",21
+South Jordan,"Cottonwood Heights",19
+South Jordan,"Midvale",11
+South Jordan,"Bluffdale",11
+South Jordan,"Lehi",21
+South Jordan,"Saratoga Springs",28
+South Jordan,"Eagle Mountain",39
+South Jordan,"University of Utah",32
+South Jordan,"SLC International Airport",30
+South Jordan,"Silicon Slopes (Lehi, Thanksgiving Point)",16
+South Jordan,"Provo / BYU",41
+South Jordan,"Hill Air Force Base",52
+South Jordan,"SLC VA Medical Center",28
+South Jordan,"Intermountain Medical Center (Murray)",14
+South Jordan,"Zions Technology Center (Midvale)",7
+Riverton,"Salt Lake City",26
+Riverton,"West Valley City",24
+Riverton,"Taylorsville",19
+Riverton,"Kearns",20
+Riverton,"Magna",31
+Riverton,"Murray",19
+Riverton,"West Jordan",12
+Riverton,"South Jordan",7
+Riverton,"Riverton",0
+Riverton,"Herriman",12
+Riverton,"Sandy",16
+Riverton,"Draper",9
+Riverton,"Millcreek",22
+Riverton,"Holladay",26
+Riverton,"Cottonwood Heights",24
+Riverton,"Midvale",16
+Riverton,"Bluffdale",4
+Riverton,"Lehi",20
+Riverton,"Saratoga Springs",23
+Riverton,"Eagle Mountain",33
+Riverton,"University of Utah",37
+Riverton,"SLC International Airport",34
+Riverton,"Silicon Slopes (Lehi, Thanksgiving Point)",15
+Riverton,"Provo / BYU",40
+Riverton,"Hill Air Force Base",57
+Riverton,"SLC VA Medical Center",33
+Riverton,"Intermountain Medical Center (Murray)",18
+Riverton,"Zions Technology Center (Midvale)",12
+Herriman,"Salt Lake City",35
+Herriman,"West Valley City",23
+Herriman,"Taylorsville",24
+Herriman,"Kearns",21
+Herriman,"Magna",27
+Herriman,"Murray",28
+Herriman,"West Jordan",18
+Herriman,"South Jordan",15
+Herriman,"Riverton",11
+Herriman,"Herriman",0
+Herriman,"Sandy",25
+Herriman,"Draper",18
+Herriman,"Millcreek",31
+Herriman,"Holladay",35
+Herriman,"Cottonwood Heights",33
+Herriman,"Midvale",23
+Herriman,"Bluffdale",11
+Herriman,"Lehi",25
+Herriman,"Saratoga Springs",26
+Herriman,"Eagle Mountain",35
+Herriman,"University of Utah",46
+Herriman,"SLC International Airport",35
+Herriman,"Silicon Slopes (Lehi, Thanksgiving Point)",22
+Herriman,"Provo / BYU",46
+Herriman,"Hill Air Force Base",65
+Herriman,"SLC VA Medical Center",42
+Herriman,"Intermountain Medical Center (Murray)",27
+Herriman,"Zions Technology Center (Midvale)",21
+Sandy,"Salt Lake City",26
+Sandy,"West Valley City",27
+Sandy,"Taylorsville",18
+Sandy,"Kearns",23
+Sandy,"Magna",35
+Sandy,"Murray",18
+Sandy,"West Jordan",17
+Sandy,"South Jordan",12
+Sandy,"Riverton",16
+Sandy,"Herriman",26
+Sandy,"Sandy",0
+Sandy,"Draper",9
+Sandy,"Millcreek",18
+Sandy,"Holladay",19
+Sandy,"Cottonwood Heights",14
+Sandy,"Midvale",12
+Sandy,"Bluffdale",18
+Sandy,"Lehi",26
+Sandy,"Saratoga Springs",33
+Sandy,"Eagle Mountain",45
+Sandy,"University of Utah",30
+Sandy,"SLC International Airport",34
+Sandy,"Silicon Slopes (Lehi, Thanksgiving Point)",21
+Sandy,"Provo / BYU",46
+Sandy,"Hill Air Force Base",56
+Sandy,"SLC VA Medical Center",26
+Sandy,"Intermountain Medical Center (Murray)",18
+Sandy,"Zions Technology Center (Midvale)",12
+Draper,"Salt Lake City",24
+Draper,"West Valley City",27
+Draper,"Taylorsville",19
+Draper,"Kearns",23
+Draper,"Magna",35
+Draper,"Murray",17
+Draper,"West Jordan",16
+Draper,"South Jordan",10
+Draper,"Riverton",9
+Draper,"Herriman",19
+Draper,"Sandy",9
+Draper,"Draper",0
+Draper,"Millcreek",20
+Draper,"Holladay",24
+Draper,"Cottonwood Heights",20
+Draper,"Midvale",14
+Draper,"Bluffdale",12
+Draper,"Lehi",20
+Draper,"Saratoga Springs",27
+Draper,"Eagle Mountain",39
+Draper,"University of Utah",35
+Draper,"SLC International Airport",33
+Draper,"Silicon Slopes (Lehi, Thanksgiving Point)",14
+Draper,"Provo / BYU",39
+Draper,"Hill Air Force Base",55
+Draper,"SLC VA Medical Center",31
+Draper,"Intermountain Medical Center (Murray)",16
+Draper,"Zions Technology Center (Midvale)",10
+Millcreek,"Salt Lake City",13
+Millcreek,"West Valley City",15
+Millcreek,"Taylorsville",8
+Millcreek,"Kearns",16
+Millcreek,"Magna",23
+Millcreek,"Murray",4
+Millcreek,"West Jordan",15
+Millcreek,"South Jordan",17
+Millcreek,"Riverton",21
+Millcreek,"Herriman",31
+Millcreek,"Sandy",18
+Millcreek,"Draper",20
+Millcreek,"Millcreek",0
+Millcreek,"Holladay",8
+Millcreek,"Cottonwood Heights",13
+Millcreek,"Midvale",12
+Millcreek,"Bluffdale",23
+Millcreek,"Lehi",31
+Millcreek,"Saratoga Springs",38
+Millcreek,"Eagle Mountain",50
+Millcreek,"University of Utah",19
+Millcreek,"SLC International Airport",21
+Millcreek,"Silicon Slopes (Lehi, Thanksgiving Point)",26
+Millcreek,"Provo / BYU",51
+Millcreek,"Hill Air Force Base",44
+Millcreek,"SLC VA Medical Center",15
+Millcreek,"Intermountain Medical Center (Murray)",6
+Millcreek,"Zions Technology Center (Midvale)",14
+Holladay,"Salt Lake City",19
+Holladay,"West Valley City",23
+Holladay,"Taylorsville",13
+Holladay,"Kearns",21
+Holladay,"Magna",29
+Holladay,"Murray",9
+Holladay,"West Jordan",19
+Holladay,"South Jordan",23
+Holladay,"Riverton",26
+Holladay,"Herriman",36
+Holladay,"Sandy",18
+Holladay,"Draper",24
+Holladay,"Millcreek",9
+Holladay,"Holladay",0
+Holladay,"Cottonwood Heights",9
+Holladay,"Midvale",16
+Holladay,"Bluffdale",28
+Holladay,"Lehi",36
+Holladay,"Saratoga Springs",44
+Holladay,"Eagle Mountain",56
+Holladay,"University of Utah",20
+Holladay,"SLC International Airport",27
+Holladay,"Silicon Slopes (Lehi, Thanksgiving Point)",31
+Holladay,"Provo / BYU",56
+Holladay,"Hill Air Force Base",49
+Holladay,"SLC VA Medical Center",16
+Holladay,"Intermountain Medical Center (Murray)",11
+Holladay,"Zions Technology Center (Midvale)",19
+Cottonwood Heights,"Salt Lake City",21
+Cottonwood Heights,"West Valley City",23
+Cottonwood Heights,"Taylorsville",15
+Cottonwood Heights,"Kearns",20
+Cottonwood Heights,"Magna",31
+Cottonwood Heights,"Murray",13
+Cottonwood Heights,"West Jordan",17
+Cottonwood Heights,"South Jordan",20
+Cottonwood Heights,"Riverton",24
+Cottonwood Heights,"Herriman",34
+Cottonwood Heights,"Sandy",14
+Cottonwood Heights,"Draper",20
+Cottonwood Heights,"Millcreek",13
+Cottonwood Heights,"Holladay",10
+Cottonwood Heights,"Cottonwood Heights",0
+Cottonwood Heights,"Midvale",12
+Cottonwood Heights,"Bluffdale",26
+Cottonwood Heights,"Lehi",34
+Cottonwood Heights,"Saratoga Springs",41
+Cottonwood Heights,"Eagle Mountain",53
+Cottonwood Heights,"University of Utah",21
+Cottonwood Heights,"SLC International Airport",30
+Cottonwood Heights,"Silicon Slopes (Lehi, Thanksgiving Point)",29
+Cottonwood Heights,"Provo / BYU",54
+Cottonwood Heights,"Hill Air Force Base",52
+Cottonwood Heights,"SLC VA Medical Center",17
+Cottonwood Heights,"Intermountain Medical Center (Murray)",14
+Cottonwood Heights,"Zions Technology Center (Midvale)",17
+Midvale,"Salt Lake City",18
+Midvale,"West Valley City",19
+Midvale,"Taylorsville",12
+Midvale,"Kearns",16
+Midvale,"Magna",28
+Midvale,"Murray",9
+Midvale,"West Jordan",5
+Midvale,"South Jordan",11
+Midvale,"Riverton",15
+Midvale,"Herriman",23
+Midvale,"Sandy",12
+Midvale,"Draper",14
+Midvale,"Millcreek",13
+Midvale,"Holladay",16
+Midvale,"Cottonwood Heights",12
+Midvale,"Midvale",0
+Midvale,"Bluffdale",17
+Midvale,"Lehi",25
+Midvale,"Saratoga Springs",33
+Midvale,"Eagle Mountain",44
+Midvale,"University of Utah",26
+Midvale,"SLC International Airport",26
+Midvale,"Silicon Slopes (Lehi, Thanksgiving Point)",20
+Midvale,"Provo / BYU",45
+Midvale,"Hill Air Force Base",48
+Midvale,"SLC VA Medical Center",22
+Midvale,"Intermountain Medical Center (Murray)",10
+Midvale,"Zions Technology Center (Midvale)",7
+Bluffdale,"Salt Lake City",27
+Bluffdale,"West Valley City",23
+Bluffdale,"Taylorsville",22
+Bluffdale,"Kearns",20
+Bluffdale,"Magna",32
+Bluffdale,"Murray",20
+Bluffdale,"West Jordan",15
+Bluffdale,"South Jordan",10
+Bluffdale,"Riverton",5
+Bluffdale,"Herriman",11
+Bluffdale,"Sandy",17
+Bluffdale,"Draper",10
+Bluffdale,"Millcreek",23
+Bluffdale,"Holladay",27
+Bluffdale,"Cottonwood Heights",25
+Bluffdale,"Midvale",17
+Bluffdale,"Bluffdale",0
+Bluffdale,"Lehi",17
+Bluffdale,"Saratoga Springs",19
+Bluffdale,"Eagle Mountain",29
+Bluffdale,"University of Utah",38
+Bluffdale,"SLC International Airport",34
+Bluffdale,"Silicon Slopes (Lehi, Thanksgiving Point)",14
+Bluffdale,"Provo / BYU",39
+Bluffdale,"Hill Air Force Base",58
+Bluffdale,"SLC VA Medical Center",34
+Bluffdale,"Intermountain Medical Center (Murray)",19
+Bluffdale,"Zions Technology Center (Midvale)",13
+Lehi,"Salt Lake City",35
+Lehi,"West Valley City",38
+Lehi,"Taylorsville",30
+Lehi,"Kearns",35
+Lehi,"Magna",46
+Lehi,"Murray",28
+Lehi,"West Jordan",27
+Lehi,"South Jordan",21
+Lehi,"Riverton",20
+Lehi,"Herriman",26
+Lehi,"Sandy",25
+Lehi,"Draper",18
+Lehi,"Millcreek",31
+Lehi,"Holladay",35
+Lehi,"Cottonwood Heights",33
+Lehi,"Midvale",25
+Lehi,"Bluffdale",18
+Lehi,"Lehi",0
+Lehi,"Saratoga Springs",13
+Lehi,"Eagle Mountain",28
+Lehi,"University of Utah",46
+Lehi,"SLC International Airport",44
+Lehi,"Silicon Slopes (Lehi, Thanksgiving Point)",9
+Lehi,"Provo / BYU",26
+Lehi,"Hill Air Force Base",66
+Lehi,"SLC VA Medical Center",42
+Lehi,"Intermountain Medical Center (Murray)",27
+Lehi,"Zions Technology Center (Midvale)",21
+Saratoga Springs,"Salt Lake City",43
+Saratoga Springs,"West Valley City",42
+Saratoga Springs,"Taylorsville",37
+Saratoga Springs,"Kearns",38
+Saratoga Springs,"Magna",47
+Saratoga Springs,"Murray",36
+Saratoga Springs,"West Jordan",34
+Saratoga Springs,"South Jordan",28
+Saratoga Springs,"Riverton",23
+Saratoga Springs,"Herriman",27
+Saratoga Springs,"Sandy",33
+Saratoga Springs,"Draper",26
+Saratoga Springs,"Millcreek",39
+Saratoga Springs,"Holladay",43
+Saratoga Springs,"Cottonwood Heights",40
+Saratoga Springs,"Midvale",33
+Saratoga Springs,"Bluffdale",19
+Saratoga Springs,"Lehi",13
+Saratoga Springs,"Saratoga Springs",0
+Saratoga Springs,"Eagle Mountain",21
+Saratoga Springs,"University of Utah",54
+Saratoga Springs,"SLC International Airport",52
+Saratoga Springs,"Silicon Slopes (Lehi, Thanksgiving Point)",16
+Saratoga Springs,"Provo / BYU",34
+Saratoga Springs,"Hill Air Force Base",74
+Saratoga Springs,"SLC VA Medical Center",50
+Saratoga Springs,"Intermountain Medical Center (Murray)",35
+Saratoga Springs,"Zions Technology Center (Midvale)",29
+Eagle Mountain,"Salt Lake City",55
+Eagle Mountain,"West Valley City",52
+Eagle Mountain,"Taylorsville",49
+Eagle Mountain,"Kearns",49
+Eagle Mountain,"Magna",56
+Eagle Mountain,"Murray",48
+Eagle Mountain,"West Jordan",44
+Eagle Mountain,"South Jordan",39
+Eagle Mountain,"Riverton",33
+Eagle Mountain,"Herriman",35
+Eagle Mountain,"Sandy",45
+Eagle Mountain,"Draper",38
+Eagle Mountain,"Millcreek",50
+Eagle Mountain,"Holladay",55
+Eagle Mountain,"Cottonwood Heights",52
+Eagle Mountain,"Midvale",44
+Eagle Mountain,"Bluffdale",29
+Eagle Mountain,"Lehi",27
+Eagle Mountain,"Saratoga Springs",21
+Eagle Mountain,"Eagle Mountain",0
+Eagle Mountain,"University of Utah",66
+Eagle Mountain,"SLC International Airport",62
+Eagle Mountain,"Silicon Slopes (Lehi, Thanksgiving Point)",27
+Eagle Mountain,"Provo / BYU",48
+Eagle Mountain,"Hill Air Force Base",86
+Eagle Mountain,"SLC VA Medical Center",61
+Eagle Mountain,"Intermountain Medical Center (Murray)",47
+Eagle Mountain,"Zions Technology Center (Midvale)",41
