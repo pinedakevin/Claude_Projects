@@ -66,7 +66,11 @@ Holding back for the weeks ahead means a stretch of big bills before the next pa
 ## Your data
 
 - Everything you enter is saved in your browser's local storage on that device. Nothing is sent anywhere.
-- **Backup** saves your plan as a `.json` file or copies a backup code. Load either one to restore your plan or move it to another device.
+- **Backup** saves your plan three ways:
+  - **Backup file (.json):** restores everything exactly.
+  - **Spreadsheet (.csv):** opens in Excel, Google Sheets or Numbers. The first table holds your inputs (settings, both plans, income, bills, debts, spending, unexpected charges), followed by a summary, every week's results for both plans, and each debt's payoff date. Edit the inputs in the spreadsheet and load the file back in.
+  - **Backup code:** copy and paste it anywhere, like a note to yourself.
+- **Load a backup** takes either file, here or on another device.
 - Clearing your browser data erases the plan, so keep a backup.
 - The page opens with a clearly labeled example household. **Start blank** clears it.
 

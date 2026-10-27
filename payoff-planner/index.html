@@ -193,8 +193,8 @@ footer{font-size:13px;color:var(--muted);max-width:72ch}
 
   <div class="panel" id="backupPanel" hidden>
     <div class="ph"><h2>Back up or move your plan</h2><button class="btn ghost" type="button" data-act="closeBackup">Close</button></div>
-    <p class="small muted">Your plan lives only in this browser. Save a backup file (or copy the backup code) to keep it safe or open it on another device.</p>
-    <div class="row"><button class="btn primary" type="button" data-act="saveFile" id="saveFileBtn">Save backup file</button><button class="btn" type="button" data-act="copyCode">Copy backup code</button><label class="btn" for="loadFile" style="display:inline-flex;align-items:center">Load backup file</label><input id="loadFile" type="file" accept=".json,application/json,text/plain" hidden></div>
+    <p class="small muted">Your plan lives only in this browser. Save a copy to keep it safe or open it on another device. The <b>backup file</b> restores everything exactly. The <b>spreadsheet</b> opens in Excel, Google Sheets or Numbers with your inputs plus every week's results; edit the inputs there and load it back in.</p>
+    <div class="row"><button class="btn primary" type="button" data-act="saveFile" id="saveFileBtn">Save backup file (.json)</button><button class="btn" type="button" data-act="saveCsv" id="saveCsvBtn">Save spreadsheet (.csv)</button><button class="btn" type="button" data-act="copyCode">Copy backup code</button><label class="btn" for="loadFile" style="display:inline-flex;align-items:center">Load a backup (.json or .csv)</label><input id="loadFile" type="file" accept=".json,.csv,application/json,text/csv,text/plain" hidden></div>
     <label class="f" for="codeBox">Backup code (paste one here to load it)<textarea id="codeBox" spellcheck="false"></textarea></label>
     <div class="row"><button class="btn" type="button" data-act="loadCode">Load pasted code</button><span class="msg" id="backupMsg" role="status" aria-live="polite"></span></div>
   </div>
@@ -302,7 +302,7 @@ footer{font-size:13px;color:var(--muted);max-width:72ch}
         <li><b>Your two plans.</b> Plan A and Plan B let you compare a steady approach with a more aggressive one. For each, set how much goes to savings each month and the least you want to keep in checking.</li>
         <li><b>Read your weeks.</b> On <b>Week by week</b>, each row shows what to send to debt that week and where checking ends up. Tap a week to see every number behind it.</li>
         <li><b>Check in once a week.</b> Update your checking and savings balances, send the amount the week says, and add any surprise costs.</li>
-        <li><b>Back it up.</b> Your plan lives only in this browser. Tap <b>Backup</b> now and then to save a copy, or to move your plan to another device.</li>
+        <li><b>Back it up.</b> Your plan lives only in this browser. Tap <b>Backup</b> now and then to save a backup file, or a spreadsheet (.csv) you can open in Excel or Google Sheets. Either one loads back in, here or on another device.</li>
       </ol>
     </div>
     <div class="grid2">
@@ -329,6 +329,7 @@ footer{font-size:13px;color:var(--muted);max-width:72ch}
       <details class="faq"><summary>What does "Below the floor" mean?</summary><p>That week, even after holding nothing back, checking ends lower than the cushion you set. Check that your pay dates and bill days are right, lower a spending category, or move a payment.</p></details>
       <details class="faq"><summary>What's the difference between the two plans?</summary><p>Only the settings you give them. A typical setup: Plan A saves a set amount each month and keeps a bigger cushion; Plan B saves little or nothing and keeps a smaller cushion, so debt goes faster but there's less of a safety net. Compare debt-free dates and interest on <b>Payoff timeline</b>.</p></details>
       <details class="faq"><summary>How do I test "what if I had to pay for a car repair?"</summary><p>On <b>Week by week</b>, add it under Unexpected charges with the week it hits. Untick <b>Count</b> to see the plan without it again. The spending slider shows what spending a little more or less each week does.</p></details>
+      <details class="faq"><summary>Can I keep my plan in a spreadsheet?</summary><p>Yes. <b>Backup → Save spreadsheet (.csv)</b> gives you one file with your inputs (income, bills, debts, spending, both plans, unexpected charges) and every week's results. You can edit the inputs in the first table, such as adding a bill or changing a balance, and load the file back with <b>Load a backup</b>. Keep the first column (Section) and the column names as they are.</p></details>
       <details class="faq"><summary>Who can see my numbers?</summary><p>Only you, in this browser. Nothing you enter is sent to the person who shared the page or anyone else. Clearing your browser data erases it, so keep a backup.</p></details>
       <details class="faq"><summary>How accurate is it?</summary><p>It's a close estimate. Real card minimums shrink as balances fall, interest is charged daily, and paychecks change. Update your balances each week and the plan corrects itself.</p></details>
     </div>
@@ -467,7 +468,7 @@ footer{font-size:13px;color:var(--muted);max-width:72ch}
     </div>
   </section>
 
-  <footer>Everything you enter stays in this browser on this device. Nothing is sent to the person who shared this page or anyone else. Use <b>Backup</b> to keep a copy or move your plan to another device. This is a planning tool, not financial advice; real minimums, interest and paydays can differ.</footer>
+  <footer>Everything you enter stays in this browser on this device. Nothing is sent to the person who shared this page or anyone else. Use <b>Backup</b> to save a backup file or a spreadsheet, or to move your plan to another device. This is a planning tool, not financial advice; real minimums, interest and paydays can differ.</footer>
 </div>
 
 <script>
@@ -795,18 +796,68 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(act==="backup"){const p=$("#backupPanel");p.hidden=!p.hidden;if(!p.hidden){$("#codeBox").value=JSON.stringify(S);$("#backupMsg").textContent="";p.scrollIntoView({block:"nearest"})}return}
   if(act==="closeBackup"){$("#backupPanel").hidden=true;return}
   if(act==="copyCode"){const txt=JSON.stringify(S);$("#codeBox").value=txt;try{await navigator.clipboard.writeText(txt);bmsg("Backup code copied. Paste it somewhere safe, like a note to yourself.","good")}catch(err){$("#codeBox").select();bmsg("Select-all is on: copy the code from the box.","")}return}
-  if(act==="saveFile"){const d=await downloadsP,fname=`payoff-plan-${iso(TODAY)}.json`;
-    if(!d&&STANDALONE){try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:"application/json"}));a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);bmsg("Backup saved to your downloads.","good")}catch(err){bmsg("Couldn't save the file. Use Copy backup code instead.","bad")}return}
-    if(!d){bmsg("Saving files isn't available here. Use Copy backup code instead.","bad");return}
-    try{await d.save({filename:fname,data:JSON.stringify(S,null,2)});bmsg("Backup saved.","good")}catch(err){bmsg(err&&err.code==="declined"?"Save canceled.":"Couldn't save the file. Use Copy backup code instead.","bad")}return}
+  if(act==="saveFile"){await saveOut(`payoff-plan-${iso(TODAY)}.json`,JSON.stringify(S,null,2),"application/json","Backup");return}
+  if(act==="saveCsv"){await saveOut(`payoff-plan-${iso(TODAY)}.csv`,toCSV(),"text/csv","Spreadsheet");return}
   if(act==="loadCode"){importText($("#codeBox").value);return}
 });
+async function saveOut(fname,data,type,what){const d=await downloadsP;
+  if(!d&&STANDALONE){try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);bmsg(`${what} saved to your downloads.`,"good")}catch(err){bmsg("Couldn't save the file. Use Copy backup code instead.","bad")}return}
+  if(!d){bmsg("Saving files isn't available here. Use Copy backup code instead.","bad");return}
+  try{await d.save({filename:fname,data});bmsg(`${what} saved.`,"good")}catch(err){bmsg(err&&err.code==="declined"?"Save canceled.":"Couldn't save the file. Use Copy backup code instead.","bad")}}
+/* ---------- spreadsheet (.csv) ---------- */
+const FREQ_LABEL=Object.fromEntries(FREQ);
+const STRAT_LABEL={avalanche:"Highest interest first",snowball:"Smallest balance first",custom:"In my order"};
+const SET_ROWS=[["Checking balance today","checking"],["Savings balance today","savings"],["Emergency fund goal","efGoal"],["Weeks to show","weeks"],["Look-ahead for bills (weeks)","hold"],["Balances as of","asOf"],["Payoff order","strategy"],["Flexible spending vs budget per week","flex"]];
+const PLAN_ROWS=[["Plan name","name"],["Keep in checking at least","floor"],["To savings each month","save"],["Savings day of month","saveDay"],["Stop saving at emergency fund goal","stopAtGoal"],["Send today's savings to debt","sweep"]];
+const COLS=["Section","Name","Amount","How often","Date","Day","Day 2","Balance","APR %","Minimum","Due day","0% promo until","Pay from","Count","Value"];
+const r2=n=>Math.round(n*100)/100;
+function toCSV(){const q=v=>{v=v==null?"":String(v);return /^[=+\-@]/.test(v)&&isNaN(+v)?"'"+v:/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const rows=[["Payoff Planner",`Exported ${iso(TODAY)}`],["Edit the rows in the first table, then load this file back in with Backup > Load a backup. The tables after the first blank row are results and are ignored when loading."],[],COLS];
+  const row=o=>COLS.map(c=>o[c]??"");
+  SET_ROWS.forEach(([l,k])=>rows.push(row({Section:"Setting",Name:l,Value:k==="strategy"?STRAT_LABEL[S.strategy]:S[k]})));
+  ["a","b"].forEach(p=>PLAN_ROWS.forEach(([l,k])=>{const v=S.plans[p][k];rows.push(row({Section:"Plan "+p.toUpperCase(),Name:l,Value:typeof v==="boolean"?(v?"Yes":"No"):v}))}));
+  S.incomes.forEach(i=>rows.push(row({Section:"Income",Name:i.name,Amount:i.amount,"How often":FREQ_LABEL[i.freq],Date:i.date,Day:i.day,"Day 2":i.day2})));
+  S.bills.forEach(i=>rows.push(row({Section:"Bill",Name:i.name,Amount:i.amount,"How often":FREQ_LABEL[i.freq],Date:i.date,Day:i.day,"Day 2":i.day2})));
+  S.debts.forEach(d=>rows.push(row({Section:"Debt",Name:d.name,Balance:d.balance,"APR %":d.apr,Minimum:d.min,"Due day":d.day,"0% promo until":d.promo})));
+  S.pools.forEach(p=>rows.push(row({Section:"Spending",Name:p.name,Amount:p.amount})));
+  S.charges.forEach(c=>rows.push(row({Section:"Unexpected",Name:c.name,Amount:c.amount,Date:c.date,"Pay from":c.from==="savings"?"Savings":"Cash flow",Count:c.on!==false?"Yes":"No"})));
+  if(RES){const pa=pname("a"),pb=pname("b");
+    rows.push([],["Summary","Debt-free","Months to go","Interest until debt-free","Sent to debt in shown weeks"]);
+    ["a","b"].forEach(p=>{const r=RES[p];rows.push([pname(p),r.free?iso(r.free):(r.startDebt>0?"10+ years":"No debt"),r.free?Math.max(0,Math.round((r.free-TODAY)/DAY/30.44)):"",r2(r.interest),r2(r.sentWin)])});
+    rows.push([],["Week of","Plan","Checking at start","Money in","Bills","Debt minimums","Unexpected (cash)","Unexpected (from savings)","To savings","Flexible spending","Held back","Send extra","Goes to","Checking at end","Savings at end","Total debt at end","Paid off this week"]);
+    RES.a.weeks.forEach((wa,i)=>{[["a",wa],["b",RES.b.weeks[i]]].forEach(([p,x])=>{if(!x)return;rows.push([iso(x.mon),pname(p),r2(x.start),r2(x.inn),r2(x.w.billSum),r2(x.minsPaid),r2(x.chCash),r2(x.chSav),r2(x.save),r2(x.allow),r2(x.hold),r2(x.send),x.parts.filter(t=>t.amt>=0.5).map(t=>`${t.name} ${Math.round(t.amt)}`).join("; "),r2(x.end),r2(x.sav),r2(x.debt),x.paidOff.join("; ")])})});
+    rows.push([],["Debt","Balance","APR %",`Paid off (${pa})`,`Paid off (${pb})`]);
+    order(S.debts.filter(d=>num(d.balance)>0).map(d=>({id:d.id,name:d.name||"Debt",bal:num(d.balance),apr:num(d.apr)}))).forEach(d=>rows.push([d.name,d.bal,d.apr,RES.a.payoff[d.id]?iso(RES.a.payoff[d.id]):"",RES.b.payoff[d.id]?iso(RES.b.payoff[d.id]):""]))}
+  return "\ufeff"+rows.map(x=>x.map(q).join(",")).join("\r\n")+"\r\n"}
+function parseCSV(t){t=String(t).replace(/^\ufeff/,"");const rows=[];let row=[],f="",inQ=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(inQ){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else inQ=false}else f+=c}
+    else if(c==='"')inQ=true;else if(c===","){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}else f+=c}
+  if(f!==""||row.length){row.push(f);rows.push(row)}return rows}
+function anyDate(v){v=String(v||"").trim();if(!v)return "";let m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return iso(mk(+m[1],+m[2]-1,+m[3]));
+  m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);if(m){let y=+m[3];if(y<100)y+=2000;return iso(mk(y,+m[1]-1,+m[2]))}return ""}
+const freqOf=v=>{v=String(v||"").trim().toLowerCase();const h=FREQ.find(([k,l])=>k===v||l.toLowerCase()===v);return h?h[0]:"monthly"};
+const yes=v=>/^(yes|y|true|1)$/i.test(String(v).trim());
+function fromCSV(text){const rows=parseCSV(text),hi=rows.findIndex(r=>(r[0]||"").trim()==="Section");if(hi<0)return null;
+  const H=rows[hi].map(h=>h.trim()),o=blank();Object.assign(o,{incomes:[],bills:[],debts:[],pools:[],charges:[],example:false});
+  for(let i=hi+1;i<rows.length;i++){const r=rows[i],sec=(r[0]||"").trim();if(!sec)break;const g=n=>{const j=H.indexOf(n);const v=j>=0?String(r[j]??"").trim():"";return /^'[=+\-@]/.test(v)?v.slice(1):v};
+    if(sec==="Setting"){const e=SET_ROWS.find(([l])=>l===g("Name"));if(!e)continue;const v=g("Value");
+      if(e[1]==="asOf")o.asOf=anyDate(v)||iso(TODAY);else if(e[1]==="strategy")o.strategy=Object.keys(STRAT_LABEL).find(k=>STRAT_LABEL[k].toLowerCase()===v.toLowerCase()||k===v)||"avalanche";else o[e[1]]=num(v)}
+    else if(/^Plan [AB]$/.test(sec)){const p=sec.slice(-1).toLowerCase(),e=PLAN_ROWS.find(([l])=>l===g("Name"));if(!e)continue;const v=g("Value");o.plans[p][e[1]]=e[1]==="name"?v.slice(0,24):(e[1]==="stopAtGoal"||e[1]==="sweep")?yes(v):num(v)}
+    else if(sec==="Income"||sec==="Bill")o[sec==="Income"?"incomes":"bills"].push({id:uid(),name:g("Name").slice(0,60),amount:num(g("Amount")),freq:freqOf(g("How often")),date:anyDate(g("Date")),day:num(g("Day"))||1,day2:num(g("Day 2"))||15});
+    else if(sec==="Debt")o.debts.push({id:uid(),name:g("Name").slice(0,60),balance:num(g("Balance")),apr:num(g("APR %")),min:num(g("Minimum")),day:num(g("Due day"))||1,promo:anyDate(g("0% promo until"))});
+    else if(sec==="Spending")o.pools.push({id:uid(),name:g("Name").slice(0,60),amount:num(g("Amount"))});
+    else if(sec==="Unexpected")o.charges.push({id:uid(),name:g("Name").slice(0,60),amount:num(g("Amount")),date:anyDate(g("Date"))||iso(TODAY),from:/sav/i.test(g("Pay from"))?"savings":"cash",on:g("Count")===""||yes(g("Count"))});
+  }
+  return o}
 function bmsg(t,c){const m=$("#backupMsg");m.textContent=t;m.className="msg "+(c||"")}
-function importText(txt){let o=null;try{o=JSON.parse(String(txt||"").trim())}catch(e){}
-  if(!valid(o)){bmsg("That doesn't look like a Payoff Planner backup. Check that you copied all of it.","bad");return}
+function importText(txt){const t=String(txt||"").trim();let o=null,csv=false;
+  if(t.startsWith("{")){try{o=JSON.parse(t)}catch(e){}}else{o=fromCSV(t);csv=!!o;if(o){o.ret=S.ret;o.view=S.view;o.tab="weeks"}}
+  if(!valid(o)){bmsg(csv?"That spreadsheet is missing its Section column. Load a .csv saved from Payoff Planner.":"That doesn't look like a Payoff Planner backup. Check that you copied all of it.","bad");return}
   const clean=a=>a.map(x=>({...x,id:String(x.id||uid()).replace(/[^a-z0-9]/gi,"").slice(0,12)||uid()}));
   ["incomes","bills","debts","pools","charges"].forEach(k=>o[k]=clean(o[k]));
-  S=normalize(o);S.example=false;VIEW=S.view||"both";OPEN=null;persist();renderSetup();renderAll();showTab(S.tab||"weeks",true);bmsg("Plan loaded.","good")}
+  S=normalize(o);S.example=false;VIEW=S.view||"both";OPEN=null;persist();renderSetup();renderAll();showTab(S.tab||"weeks",true);bmsg(csv?`Spreadsheet loaded: ${S.incomes.length} income, ${S.bills.length} bills, ${S.debts.length} debts.`:"Plan loaded.","good")}
 $("#loadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(f.size>1e6){bmsg("That file is too large to be a plan backup.","bad");return}
   const r=new FileReader();r.onload=()=>importText(r.result);r.onerror=()=>bmsg("Couldn't read that file.","bad");r.readAsText(f);e.target.value=""});
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(TABS.includes(h))showTab(h,false)});
@@ -814,7 +865,7 @@ window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(TABS
 /* ---------- boot ---------- */
 let downloadsP=Promise.resolve(null);const STANDALONE=!(window.claude&&window.claude.use);
 try{downloadsP=window.claude&&claude.use?claude.use("downloads").catch(()=>null):Promise.resolve(null)}catch(e){}
-downloadsP.then(d=>{if(!d&&!STANDALONE){const b=$("#saveFileBtn");if(b)b.hidden=true}});
+downloadsP.then(d=>{if(!d&&!STANDALONE){["#saveFileBtn","#saveCsvBtn"].forEach(id=>{const b=$(id);if(b)b.hidden=true})}});
 renderSetup();renderAll();
 const h=location.hash.slice(1);showTab(TABS.includes(h)?h:(firstVisit?"weeks":S.tab||"weeks"),false);
 if(firstVisit)persist();
