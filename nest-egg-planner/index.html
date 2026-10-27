@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Budget every week and see where your retirement savings are headed. A free planner that runs in your browser.">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Nest Egg Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+</head>
+<body>
+<style>
+/* Layout: a planning tool. Header with storage status and backup, then views: Week by week (budget), Retirement (projection by age), Your money (setup), How to use, Retirement 101.
+   Palette: cool slate ground; Plan A in deep green, Plan B in violet; semantic green/amber/red for state. */
+:root{
+  --bg:#F1F3F6; --surface:#FFFFFF; --sunk:#F6F7FA; --ink:#12182B; --muted:#5C6478; --line:#DCE0E8;
+  --a:#17694F; --a-ink:#FFFFFF; --a-soft:#DDF0E8; --b:#6B4FB8; --b-soft:#ECE6F8;
+  --good:#1C7A4A; --good-soft:#E1F2E8; --warn:#8A5D00; --warn-soft:#FAF0D6; --bad:#B3261E; --bad-soft:#FBE3E1;
+  --display:"Sora","Avenir Next","Segoe UI",sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D111A; --surface:#151B27; --sunk:#111621; --ink:#E6EAF2; --muted:#98A1B3; --line:#262E3E;
+  --a:#5FD3A8; --a-ink:#06150F; --a-soft:#12302A; --b:#B9A4F5; --b-soft:#2A2340;
+  --good:#6FD39B; --good-soft:#13291D; --warn:#E8B84E; --warn-soft:#2C2412; --bad:#F2857C; --bad-soft:#33191A;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D111A; --surface:#151B27; --sunk:#111621; --ink:#E6EAF2; --muted:#98A1B3; --line:#262E3E;
+  --a:#5FD3A8; --a-ink:#06150F; --a-soft:#12302A; --b:#B9A4F5; --b-soft:#2A2340;
+  --good:#6FD39B; --good-soft:#13291D; --warn:#E8B84E; --warn-soft:#2C2412; --bad:#F2857C; --bad-soft:#33191A;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 48px;display:flex;flex-direction:column;gap:16px}
+p{margin:0}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;margin:0;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--a)}
+header p.sub{margin-top:6px;color:var(--muted);font-size:14.5px;max-width:56ch}
+h2{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0}
+.eyebrow{font:700 11px var(--body);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:13.5px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.chip.good{background:var(--good-soft);color:var(--good);border-color:transparent}
+.chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.chip.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.chip.a{background:var(--a-soft);color:var(--a);border-color:transparent}
+.chip.b{background:var(--b-soft);color:var(--b);border-color:transparent}
+.btn{font:600 13.5px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--a);color:var(--a-ink);border-color:var(--a)}
+.btn.sm{padding:4px 10px;font-size:12.5px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.icon{padding:4px 8px;line-height:1}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.banner{border-radius:var(--r);padding:12px 14px;background:var(--a-soft);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14.5px}
+.banner.warn{background:var(--warn-soft)}
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{font:600 14.5px var(--body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 12px 9px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--a)}
+.view{display:flex;flex-direction:column;gap:16px}
+/* forms */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);font-weight:600;min-width:0}
+.f input,.f select{font:500 16px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:100%;min-width:0}
+.f input[type=number]{font-family:var(--mono);font-size:15px}
+label.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink);font-weight:500}
+label.chk input{width:18px;height:18px;accent-color:var(--a)}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:grid;gap:8px 10px;align-items:end;padding:10px 12px;background:var(--sunk);border:1px solid var(--line);border-radius:9px}
+.item.inc,.item.bill{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.3fr) minmax(0,1.4fr) auto}
+.item.debt{grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,1.4fr) auto}
+.item.pool{grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto}
+.item.chg{grid-template-columns:auto minmax(0,2fr) minmax(0,1fr) minmax(0,1.3fr) minmax(0,1.2fr) auto}
+.when{display:flex;gap:6px;min-width:0}
+.when label{flex:1}
+.acts{display:flex;gap:4px;align-items:center;padding-bottom:3px}
+@media (max-width:760px){.item.inc,.item.bill,.item.chg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.item.debt{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}.item.pool{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .item .wide{grid-column:1/-1}.item .acts{grid-column:1/-1;justify-content:flex-end}}
+.empty{color:var(--muted);font-size:14px;padding:4px 0}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;font-size:14.5px}
+.kv .v{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.kv .sep{grid-column:1/-1;border-top:1px solid var(--line)}
+.kv b{font-weight:700}
+.plancard{border-top:4px solid var(--a)}
+.plancard.b{border-top-color:var(--b)}
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+/* outlook */
+.planbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:3px;gap:2px}
+.seg button{font:600 13.5px var(--body);border:0;background:transparent;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.15}
+.stat span{font-size:12.5px;color:var(--muted)}
+.k{font:700 10.5px var(--body);letter-spacing:.1em;text-transform:uppercase}
+.k.a{color:var(--a)} .k.b{color:var(--b)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:520px;height:auto}
+.wkl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+details.wk{border-bottom:1px solid var(--line)}
+details.wk:last-child{border-bottom:0}
+details.wk[open]{background:var(--sunk)}
+details.wk>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) 16px;gap:6px 14px;padding:11px 14px;align-items:center}
+.wkl.single details.wk>summary{grid-template-columns:minmax(0,1.2fr) minmax(0,2fr) 16px}
+details.wk>summary::-webkit-details-marker{display:none}
+details.wk>summary:hover{background:var(--sunk)}
+.dt{display:flex;flex-direction:column;min-width:0}
+.dt b{font-weight:700}
+.dt .sub{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc{display:flex;flex-direction:column;min-width:0;padding-left:10px;border-left:3px solid var(--a)}
+.pc.b{border-left-color:var(--b)}
+.pc .amt{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:16px;font-weight:500;line-height:1.3}
+.pc .amt.zero{color:var(--muted)}
+.pc .to{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.caret{width:16px;height:16px;color:var(--muted);transition:transform .15s ease}
+details.wk[open] .caret{transform:rotate(90deg)}
+.evts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.evts:empty{display:none}
+@media (max-width:600px){details.wk>summary{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 16px}.wkl.single details.wk>summary{grid-template-columns:minmax(0,1fr) 16px}.dt{grid-column:1/-1}}
+.wkb{padding:2px 14px 16px;display:flex;flex-direction:column;gap:10px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;white-space:nowrap}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+th.a{color:var(--a)} th.b{color:var(--b)}
+td.txt{text-align:right;font-size:13px}
+tr.key td{font-weight:700;border-top:2px solid var(--line)}
+.due{font-size:13.5px;color:var(--muted)}
+.uc{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px dashed var(--line);border-radius:var(--r);background:var(--sunk)}
+.ucform{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.5fr) minmax(0,1.3fr) auto;gap:10px;align-items:end}
+@media (max-width:760px){.ucform{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.flexrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 12px;align-items:center}
+.flexrow input[type=range]{width:100%;accent-color:var(--a)}
+.flexrow output{font-family:var(--mono);font-size:14px;white-space:nowrap}
+.msg{font-size:13.5px} .msg.bad{color:var(--bad)} .msg.good{color:var(--good)}
+textarea{font:500 13px var(--mono);color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px;width:100%;min-height:110px;resize:vertical}
+/* docs */
+.doc p,.doc li{max-width:74ch}
+.doc ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+ol.steps{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:8px}
+ol.steps li{padding-left:4px}
+ol.steps li::marker{font-weight:700;color:var(--a);font-family:var(--mono)}
+dl.gloss{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px;font-size:14.5px}
+dl.gloss dt{font-weight:700} dl.gloss dd{margin:0}
+@media (max-width:520px){dl.gloss{grid-template-columns:minmax(0,1fr);gap:2px}dl.gloss dd{margin-bottom:8px}}
+details.faq{border-top:1px solid var(--line);padding:10px 0}
+details.faq>summary{cursor:pointer;font-weight:600}
+details.faq p{margin-top:6px;color:var(--ink)}
+table.cmp2 td{font-size:14px}
+table.cmp2 td:first-child{min-width:110px}
+.fgrid.g4{grid-template-columns:repeat(4,minmax(0,1fr));align-items:end}
+@media (max-width:760px){.fgrid.g4{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.f .seg{align-self:flex-start}
+.seg.nowrap{flex-wrap:nowrap}
+@media (max-width:760px){.fgrid.g4 .full{grid-column:1/-1}}
+.bigv{font-family:var(--display);font-weight:700;font-size:34px;line-height:1.05;letter-spacing:-.01em}
+.bar{display:flex;height:14px;border-radius:99px;overflow:hidden;border:1px solid var(--line);background:var(--sunk)}
+.bar i{display:block;height:100%}
+footer{font-size:13px;color:var(--muted);max-width:72ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.item.acct{grid-template-columns:minmax(0,1.5fr) minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.1fr) minmax(0,.8fr) auto}
+@media (max-width:760px){.item.acct{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.fgrid.g3{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+@media (max-width:760px){.fgrid.g3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Nest Egg <em>Planner</em></h1>
+      <p class="sub">Budget every week, build an emergency fund, and see where your retirement savings are headed. Compare your current plan with a stretch plan.</p>
+    </div>
+    <div class="row" id="status"></div>
+  </header>
+
+  <div id="banner"></div>
+
+  <div class="panel" id="backupPanel" hidden>
+    <div class="ph"><h2>Back up or move your plan</h2><button class="btn ghost" type="button" data-act="closeBackup">Close</button></div>
+    <p class="small muted">Your plan lives only in this browser. Save a copy to keep it safe or open it on another device. The <b>backup file</b> restores everything exactly. The <b>spreadsheet</b> opens in Excel, Google Sheets or Numbers with your inputs, every week's budget, and your retirement projection by age; edit the inputs there and load it back in.</p>
+    <div class="row"><button class="btn primary" type="button" data-act="saveFile" id="saveFileBtn">Save backup file (.json)</button><button class="btn" type="button" data-act="saveCsv" id="saveCsvBtn">Save spreadsheet (.csv)</button><button class="btn" type="button" data-act="copyCode">Copy backup code</button><label class="btn" for="loadFile" style="display:inline-flex;align-items:center">Load a backup (.json or .csv)</label><input id="loadFile" type="file" accept=".json,.csv,application/json,text/csv,text/plain" hidden></div>
+    <label class="f" for="codeBox">Backup code (paste one here to load it)<textarea id="codeBox" spellcheck="false"></textarea></label>
+    <div class="row"><button class="btn" type="button" data-act="loadCode">Load pasted code</button><span class="msg" id="backupMsg" role="status" aria-live="polite"></span></div>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Planner views">
+    <button type="button" role="tab" id="tab-weeks" data-tab="weeks" aria-controls="view-weeks">Week by week</button>
+    <button type="button" role="tab" id="tab-retire" data-tab="retire" aria-controls="view-retire">Retirement</button>
+    <button type="button" role="tab" id="tab-money" data-tab="money" aria-controls="view-money">Your money</button>
+    <button type="button" role="tab" id="tab-howto" data-tab="howto" aria-controls="view-howto">How to use</button>
+    <button type="button" role="tab" id="tab-learn" data-tab="learn" aria-controls="view-learn">Retirement 101</button>
+  </nav>
+
+  <!-- WEEK BY WEEK -->
+  <section class="view" id="view-weeks" role="tabpanel" aria-labelledby="tab-weeks">
+    <div class="planbar"><span class="small muted">Show:</span><div class="seg" role="group" aria-label="Plans to show" id="viewSeg"><button type="button" data-view="a" aria-pressed="false" id="segA">Plan A</button><button type="button" data-view="b" aria-pressed="false" id="segB">Plan B</button><button type="button" data-view="both" aria-pressed="true">Both side by side</button></div></div>
+    <div id="weeksWarn"></div>
+    <div class="stats" id="stats"></div>
+    <div class="panel">
+      <div class="ph"><span class="eyebrow" id="chartTitle">Put toward your future, total so far</span><div class="legend" id="legend"></div></div>
+      <div class="chart" id="weekChart"></div>
+    </div>
+    <div class="uc">
+      <div class="ph"><div><div class="eyebrow">Flexibility</div><h2 style="font-size:18px">Unexpected charges and what-ifs</h2></div></div>
+      <p class="small muted">Add a cost you didn't plan for and every week re-runs for both plans. Cash flow comes out of that week's money. Emergency fund comes out of your emergency savings when there's enough in it.</p>
+      <div class="ucform">
+        <label class="f" for="qcName">What is it<input id="qcName" type="text" maxlength="60" placeholder="Car repair" autocomplete="off"></label>
+        <label class="f" for="qcAmt">Amount<input id="qcAmt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="400"></label>
+        <label class="f" for="qcWeek">Week it hits<select id="qcWeek"></select></label>
+        <label class="f" for="qcFrom">Pay from<select id="qcFrom"><option value="cash">Cash flow</option><option value="savings">Emergency fund</option></select></label>
+        <button class="btn primary" type="button" data-act="quickCharge">Add</button>
+      </div>
+      <span class="msg" id="qcMsg" role="status" aria-live="polite"></span>
+      <div class="items" id="qcList"></div>
+      <div class="flexrow">
+        <label class="f" for="flexAdj">Flexible spending vs your budget, every week</label>
+        <output id="flexOut" for="flexAdj">$0/wk</output>
+        <button class="btn sm" type="button" data-act="flexReset">Reset</button>
+        <input id="flexAdj" type="range" min="-200" max="300" step="25" value="0" style="grid-column:1/-1">
+      </div>
+    </div>
+    <div class="ph"><h2 id="weeksTitle">Your weeks</h2><button class="btn" type="button" data-act="expand" id="expandBtn">Expand all weeks</button></div>
+    <div class="wkl" id="weeks"></div>
+    <p class="small muted">How each week works: money in, minus bills, savings and investing moves, and your flexible spending. Whatever's left either stays in checking or, if a plan says so, gets invested after holding back enough for the next few weeks' bills and keeping your checking cushion.</p>
+  </section>
+
+  <!-- RETIREMENT -->
+  <section class="view" id="view-retire" role="tabpanel" aria-labelledby="tab-retire" hidden>
+    <div class="planbar" style="justify-content:space-between">
+      <div class="row"><span class="small muted">Yearly return:</span><div class="seg nowrap" role="group" aria-label="Yearly return" id="rrSeg"><button type="button" data-rr="5">5%</button><button type="button" data-rr="7">7%</button><button type="button" data-rr="10">10%</button></div></div>
+      <div class="row"><span class="small muted">Show money in:</span><div class="seg nowrap" role="group" aria-label="Dollars" id="realSeg"><button type="button" data-real="1">Today's dollars</button><button type="button" data-real="0">Future dollars</button></div></div>
+    </div>
+    <div id="retWarn"></div>
+    <div class="stats" id="rStats"></div>
+    <div class="panel">
+      <div class="ph"><span class="eyebrow" id="rChartTitle">Retirement savings by age</span><div class="legend" id="rLegend"></div></div>
+      <div class="chart" id="rChart"></div>
+      <p class="small muted" id="rNote"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel"><div class="ph"><h2>Income in retirement</h2><span class="small muted" id="incNote"></span></div><div id="rIncome"></div></div>
+      <div class="panel"><div class="ph"><h2>Where the money sits at retirement</h2></div><div id="rTypes"></div></div>
+    </div>
+    <div class="panel"><div class="ph"><h2>Milestones by age</h2></div><div class="tablewrap" id="rTable"></div></div>
+  </section>
+
+  <!-- YOUR MONEY -->
+  <section class="view" id="view-money" role="tabpanel" aria-labelledby="tab-money" hidden>
+    <div class="panel" id="moneySummary"></div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="ph"><h2>Right now</h2></div>
+        <div class="fgrid">
+          <label class="f" for="s-checking">Checking balance today<input id="s-checking" data-k="s" data-f="checking" type="number" inputmode="decimal" step="0.01"></label>
+          <label class="f" for="s-savings">Emergency fund today<input id="s-savings" data-k="s" data-f="savings" type="number" inputmode="decimal" step="0.01" min="0"></label>
+          <label class="f" for="s-efGoal">Emergency fund goal<input id="s-efGoal" data-k="s" data-f="efGoal" type="number" inputmode="decimal" step="1" min="0"></label>
+          <label class="f" for="s-asOf">Balances as of<input id="s-asOf" data-k="s" data-f="asOf" type="date"></label>
+          <label class="f" for="s-weeks">Weeks to show<input id="s-weeks" data-k="s" data-f="weeks" type="number" inputmode="numeric" min="4" max="104" step="1"></label>
+          <label class="f" for="s-hold">Look-ahead for bills (weeks)<input id="s-hold" data-k="s" data-f="hold" type="number" inputmode="numeric" min="1" max="8" step="1"></label>
+        </div>
+        <p class="small muted">Update checking and your emergency fund whenever you check in. The weeks always start from today with these numbers.</p>
+      </div>
+      <div class="panel">
+        <div class="ph"><h2>Flexible spending</h2><span class="small muted" id="poolNote"></span></div>
+        <p class="small muted">Groceries, gas, eating out, anything that varies. These categories cover each other: the monthly total is the real limit, and each week gets total × 12 ÷ 52.</p>
+        <div class="items" id="list-pools"></div>
+        <div><button class="btn sm" type="button" data-add="pools">+ Add a category</button></div>
+      </div>
+    </div>
+    <div class="panel"><div class="ph"><h2>Income</h2><span class="small muted">Take-home pay, after taxes and anything already taken out of your paycheck</span></div><div class="items" id="list-incomes"></div><div><button class="btn sm" type="button" data-add="incomes">+ Add income</button></div></div>
+    <div class="panel"><div class="ph"><h2>Bills</h2><span class="small muted">Rent or mortgage, car payment, utilities, insurance, subscriptions</span></div><div class="items" id="list-bills"></div><div><button class="btn sm" type="button" data-add="bills">+ Add a bill</button></div></div>
+    <div class="panel">
+      <div class="ph"><h2>Retirement and investment accounts</h2></div>
+      <p class="small muted">For each account: today's balance, what you put in each month, and what your employer adds. Paycheck contributions are already out of your take-home pay; checking contributions are a transfer you make on the day you choose. Add old accounts you no longer contribute to with $0 a month. For a high-yield savings account, CD or money market, pick <b>Savings / CD / money market</b> and enter its interest rate.</p>
+      <div class="items" id="list-accounts"></div><div><button class="btn sm" type="button" data-add="accounts">+ Add an account</button></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>About you and retirement</h2></div>
+      <div class="fgrid g3">
+        <label class="f" for="s-age">Your age<input id="s-age" data-k="s" data-f="age" type="number" inputmode="numeric" min="16" max="90" step="1"></label>
+        <label class="f" for="s-lifeTo">Plan for money to last to age<input id="s-lifeTo" data-k="s" data-f="lifeTo" type="number" inputmode="numeric" min="60" max="110" step="1"></label>
+        <label class="f" for="s-spend">Monthly spending in retirement (today's $)<input id="s-spend" data-k="s" data-f="spend" type="number" inputmode="decimal" min="0" step="50" placeholder="Same as today"></label>
+        <label class="f" for="s-ss">Social Security per month (today's $)<input id="s-ss" data-k="s" data-f="ss" type="number" inputmode="decimal" min="0" step="10"></label>
+        <label class="f" for="s-ssAge">Social Security starts at age<input id="s-ssAge" data-k="s" data-f="ssAge" type="number" inputmode="numeric" min="62" max="70" step="1"></label>
+        <label class="f" for="s-pension">Pension per month (today's $)<input id="s-pension" data-k="s" data-f="pension" type="number" inputmode="decimal" min="0" step="10"></label>
+        <label class="f" for="s-penAge">Pension starts at age<input id="s-penAge" data-k="s" data-f="penAge" type="number" inputmode="numeric" min="40" max="80" step="1"></label>
+        <label class="f" for="s-raise">Raise each year (%)<input id="s-raise" data-k="s" data-f="raise" type="number" inputmode="decimal" min="0" max="10" step="0.1"></label>
+        <label class="f" for="s-infl">Inflation each year (%)<input id="s-infl" data-k="s" data-f="infl" type="number" inputmode="decimal" min="0" max="10" step="0.1"></label>
+      </div>
+      <p class="small muted">Your Social Security estimate is at ssa.gov (free "my Social Security" account). Leave retirement spending blank to use what you spend today on bills and flexible spending. Contributions grow with your raise each year.</p>
+    </div>
+    <div class="grid2" id="planCards"></div>
+    <div class="panel"><div class="ph"><h2>Unexpected charges</h2><span class="small muted">Untick one to try the plan without it</span></div><div class="items" id="list-charges"></div><div><button class="btn sm" type="button" data-add="charges">+ Add a charge</button></div></div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="view" id="view-howto" role="tabpanel" aria-labelledby="tab-howto" hidden>
+    <div class="panel doc">
+      <div class="eyebrow">How to use</div>
+      <h2>Set up your plan in about 15 minutes</h2>
+      <p>Have your bank app, a recent pay stub, and your retirement account statements nearby. You can change anything later, and every change updates your weeks and your retirement projection right away.</p>
+      <ol class="steps">
+        <li><b>Start fresh.</b> The planner opens with an example household. Tap <b>Start blank</b> in the banner, or type over the example numbers.</li>
+        <li><b>Right now.</b> On <b>Your money</b>, enter what's in checking and in your emergency fund today, and set an emergency fund goal (many people aim for three to six months of expenses).</li>
+        <li><b>Income.</b> Add each paycheck as take-home pay, how often it comes, and the next date it lands.</li>
+        <li><b>Bills.</b> Add everything with a set amount and due day: rent or mortgage, car payment, utilities, insurance, subscriptions.</li>
+        <li><b>Flexible spending.</b> Set a monthly amount for things that vary. The total is your real limit; each week gets total × 12 ÷ 52.</li>
+        <li><b>Accounts.</b> Add every account you already have: 401(k), IRA, HSA, brokerage, and savings, CDs or money market accounts, with today's balance and monthly contributions. Old accounts you no longer add to get $0 a month. Mark whether money comes out of your paycheck or from checking, and add any employer match. Savings-type accounts get their own interest rate.</li>
+        <li><b>About you.</b> Enter your age, your Social Security estimate, and any pension. Leave retirement spending blank to use what you spend today.</li>
+        <li><b>Your two plans.</b> Plan A and Plan B let you compare. Each sets a monthly amount for the emergency fund, a checking cushion, how much of your account contributions to make (100% is what you entered), what to do with leftover cash, and the age you retire.</li>
+        <li><b>Read your weeks.</b> <b>Week by week</b> shows each week's money in and out, what goes to savings and investing, and where checking ends up. Tap a week for every number.</li>
+        <li><b>Look ahead.</b> <b>Retirement</b> shows your savings by age, your nest egg at retirement, monthly income in retirement, and whether the money lasts.</li>
+        <li><b>Back it up.</b> Your plan lives only in this browser. Tap <b>Backup</b> now and then to save a backup file or a spreadsheet (.csv).</li>
+      </ol>
+    </div>
+    <div class="grid2">
+      <div class="panel doc">
+        <h2>How each week is figured</h2>
+        <div class="kv"><span>Checking at the start of the week</span><span class="v"></span><span>+ money that lands this week</span><span class="v"></span><span>− bills due</span><span class="v"></span><span>− investing from checking (on its day)</span><span class="v"></span><span>− transfer to your emergency fund</span><span class="v"></span><span>− your weekly flexible spending</span><span class="v"></span><span>− unexpected charges</span><span class="v"></span><span class="sep"></span><b>= what's left this week</b><span class="v"></span></div>
+        <p class="small muted">If a plan invests leftover cash, it first holds back enough for the next few weeks' bills (3 by default) and keeps your checking cushion, then invests the rest. Otherwise the leftover stays in checking.</p>
+      </div>
+      <div class="panel doc">
+        <h2>How retirement is projected</h2>
+        <ul>
+          <li>Each investment account grows at the yearly return you pick (5%, 7% or 10%), and savings, CD and money market accounts grow at their own interest rate, with your monthly contributions until the age you retire. Contributions rise with your yearly raise.</li>
+          <li>After you retire, you draw what you need each month: your retirement spending, minus Social Security and any pension once they start. All three rise with inflation.</li>
+          <li>"Lasts to" is the age when savings would run out at that pace.</li>
+          <li><b>Today's dollars</b> shows future amounts in today's buying power, which is easier to compare to what things cost now.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel doc">
+      <h2>Common questions</h2>
+      <details class="faq"><summary>What's the difference between the two plans?</summary><p>Only the settings you give them. A typical setup: Plan A is what you do today; Plan B contributes more (say 150%), invests leftover cash each week, or retires at a different age. Compare them on <b>Retirement</b>.</p></details>
+      <details class="faq"><summary>If I contribute more from my paycheck, why does my take-home drop by the full amount here?</summary><p>To keep things simple, extra paycheck contributions lower take-home dollar for dollar. Pre-tax contributions actually lower it a bit less, because you pay less income tax.</p></details>
+      <details class="faq"><summary>Why doesn't my employer match go up when I contribute more?</summary><p>Most matches have a cap, like 100% of the first 3% of pay. The planner keeps the match you entered. If yours would grow, raise the employer amount on that account.</p></details>
+      <details class="faq"><summary>Does it include taxes in retirement?</summary><p>No. Money from Traditional (pre-tax) accounts is taxed when you take it out, while Roth and most HSA withdrawals aren't. <b>Where the money sits</b> shows the split so you can plan for it.</p></details>
+      <details class="faq"><summary>Can I keep my plan in a spreadsheet?</summary><p>Yes. <b>Backup → Save spreadsheet (.csv)</b> gives you your inputs, every week's budget for both plans, and your retirement savings by age. Edit the inputs in the first table and load the file back with <b>Load a backup</b>. Keep the first column (Section) and the column names as they are.</p></details>
+      <details class="faq"><summary>Who can see my numbers?</summary><p>Only you, in this browser. Nothing you enter is sent anywhere. Clearing your browser data erases it, so keep a backup.</p></details>
+      <details class="faq"><summary>How accurate is it?</summary><p>It's an estimate. Markets don't return the same amount every year, and pay, prices and rules change. Use it to compare choices and see the direction, and update your numbers as life changes.</p></details>
+    </div>
+  </section>
+
+  <!-- RETIREMENT 101 -->
+  <section class="view" id="view-learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
+    <div class="panel doc">
+      <div class="eyebrow">Retirement 101</div>
+      <h2>The retirement accounts, explained plainly</h2>
+      <p>Retirement accounts are ordinary investment accounts with tax breaks attached. The trade for those breaks is rules: yearly limits on how much you put in, and penalties for taking money out early. Knowing a few account types and two tax "flavors" covers most of what you need.</p>
+      <p class="small muted">Dollar limits below are the IRS figures for 2026. The IRS usually announces next year's limits in November, so check for updates each year.</p>
+    </div>
+
+    <div class="panel doc" id="growth">
+      <h2>Why starting early matters</h2>
+      <p>Money invested grows, and then the growth grows too (compounding). Time does most of the work, so small amounts started early can beat bigger amounts started late. Try it:</p>
+      <div class="fgrid g4">
+        <label class="f" for="rt-m">You put in each month<input id="rt-m" data-k="ret" data-f="m" type="number" inputmode="decimal" min="0" step="10"></label>
+        <label class="f" for="rt-match">Employer adds each month<input id="rt-match" data-k="ret" data-f="match" type="number" inputmode="decimal" min="0" step="10"></label>
+        <label class="f" for="rt-y">Years<input id="rt-y" data-k="ret" data-f="y" type="number" inputmode="numeric" min="1" max="50" step="1"></label>
+        <div class="f"><span>Yearly return</span><div class="seg" role="group" aria-label="Yearly return" id="rtSeg"><button type="button" data-ret="5">5%</button><button type="button" data-ret="7">7%</button><button type="button" data-ret="10">10%</button></div></div>
+      </div>
+      <div id="rtOut"></div>
+      <p class="small muted">Before inflation and taxes. Real markets swing up and down from year to year; these are smooth averages to show the shape of growth, not a promise.</p>
+    </div>
+
+    <div class="panel doc">
+      <h2>Two tax flavors: Traditional and Roth</h2>
+      <p>Most accounts come in one or both flavors. The difference is <b>when</b> you pay income tax.</p>
+      <div class="tablewrap"><table class="cmp2"><thead><tr><th></th><th>Traditional (pre-tax)</th><th>Roth (after-tax)</th></tr></thead><tbody>
+        <tr><td>Going in</td><td>Lowers your taxable income now</td><td>No tax break now</td></tr>
+        <tr><td>While invested</td><td>Grows without yearly taxes</td><td>Grows without yearly taxes</td></tr>
+        <tr><td>Coming out in retirement</td><td>Taxed as income</td><td>Tax-free, if the rules are met</td></tr>
+        <tr><td>Tends to fit when</td><td>Your tax rate now is higher than you expect later</td><td>Your tax rate now is lower than you expect later, or you're early in your career</td></tr>
+      </tbody></table></div>
+      <p class="small muted">Many people split between both so they have some taxable and some tax-free money to draw from later.</p>
+    </div>
+
+    <div class="grid2">
+      <div class="panel doc">
+        <h2>Through your job</h2>
+        <h3>401(k), 403(b), 457(b), TSP</h3>
+        <p>Plans your employer offers: a 401(k) at companies, a 403(b) at schools, hospitals and nonprofits, a 457(b) at state and local governments, and the TSP for federal workers and the military. Money comes straight out of your paycheck.</p>
+        <ul>
+          <li><b>2026 limit:</b> $24,500 of your own pay. Age 50+ can add $8,000 more; ages 60–63 can add $11,250 instead.</li>
+          <li><b>Employer match:</b> many employers add money when you contribute, for example 100% of the first 3% of your pay. That's an instant return, which is why "get the full match" is common first advice.</li>
+          <li><b>Vesting:</b> your own contributions are always yours. Employer money may "vest" over a few years, meaning you keep it only after staying that long.</li>
+          <li><b>Changing jobs:</b> you can leave it, move it to the new job's plan, or roll it into an IRA. Cashing it out usually means taxes plus a penalty.</li>
+          <li><b>High earners:</b> starting in 2026, people who earned over about $150,000 in wages the year before must make catch-up contributions as Roth.</li>
+        </ul>
+      </div>
+      <div class="panel doc">
+        <h2>On your own</h2>
+        <h3>IRA (Individual Retirement Account)</h3>
+        <p>An account you open yourself at a brokerage, separate from any job. Anyone with earned income can contribute, and a non-working spouse can too through the working spouse.</p>
+        <ul>
+          <li><b>2026 limit:</b> $7,500 total across all your IRAs, plus $1,100 more at age 50+.</li>
+          <li><b>Roth IRA:</b> the amount you can put in phases out at higher incomes ($153,000–$168,000 single, $242,000–$252,000 married filing jointly in 2026). You can take out what you <i>contributed</i> (not the growth) anytime without tax or penalty.</li>
+          <li><b>Traditional IRA:</b> anyone with earned income can contribute, but the tax deduction phases out at higher incomes if you also have a plan at work.</li>
+          <li><b>Deadline:</b> you can contribute for a year up to the tax filing deadline the next April.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel doc">
+        <h2>If you're self-employed</h2>
+        <ul>
+          <li><b>SEP IRA:</b> simple to set up; you contribute as the employer, up to 25% of compensation (capped at $72,000 in 2026).</li>
+          <li><b>Solo 401(k):</b> for owners with no employees besides a spouse. You contribute as both employee (up to $24,500) and employer, up to $72,000 total. Often lets you save more than a SEP at lower incomes.</li>
+          <li><b>SIMPLE IRA:</b> for small businesses with employees; $17,000 limit in 2026 (more for some plans and at age 50+), with a required employer contribution.</li>
+        </ul>
+      </div>
+      <div class="panel doc">
+        <h2>The HSA: a health account that doubles for retirement</h2>
+        <p>A Health Savings Account works with a high-deductible health plan. It's the only account that's tax-free going in, while growing, and coming out for medical costs. After 65, you can take money out for anything, taxed like a Traditional IRA.</p>
+        <ul>
+          <li><b>2026 limit:</b> $4,400 self-only, $8,750 family, plus $1,000 at age 55+.</li>
+          <li>You can invest the balance and save receipts to reimburse yourself years later.</li>
+          <li>Only available if your health plan qualifies; ask HR or your insurer.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel doc">
+        <h2>Pensions and Social Security</h2>
+        <p><b>Pensions</b> (defined-benefit plans) pay a set monthly amount for life based on your pay and years of service. They're now rare outside government, teaching and some union jobs. If you have one, find out when you're vested and how the benefit is figured.</p>
+        <p><b>Social Security</b> is paid for through payroll taxes. You generally need about 10 years of work (40 credits) to qualify, and the benefit is based on your highest 35 years of earnings.</p>
+        <ul>
+          <li>You can start as early as 62, with a permanently smaller check.</li>
+          <li>Full retirement age is 67 for anyone born in 1960 or later.</li>
+          <li>Waiting past full retirement age raises the check about 8% a year, up to age 70.</li>
+          <li>See your own estimate at ssa.gov with a free "my Social Security" account.</li>
+        </ul>
+      </div>
+      <div class="panel doc">
+        <h2>A regular brokerage account</h2>
+        <p>A taxable investment account with no special tax break, but also no limits and no early-withdrawal penalties. Growth is taxed when you sell, usually at lower long-term capital gains rates if you held over a year. People often use one after filling their retirement accounts, or for goals before 59½.</p>
+        <h3 style="margin-top:6px">What to invest in</h3>
+        <ul>
+          <li><b>Target-date funds</b> (like "2055 Fund") pick a stock/bond mix for the year you plan to retire and get more conservative over time. One fund, hands-off.</li>
+          <li><b>Index funds</b> buy a whole market (like the S&amp;P 500) at very low cost.</li>
+          <li><b>Fees matter.</b> A fund's expense ratio is charged every year. 0.05% versus 1% can mean tens of thousands of dollars over a career.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel doc">
+      <h2>Rules to know before you take money out</h2>
+      <div class="tablewrap"><table class="cmp2"><tbody>
+        <tr><td><b>Age 59½</b></td><td>Taking money from a 401(k) or IRA before this usually means income tax plus a 10% penalty. Exceptions include disability, certain medical costs, and up to $10,000 from an IRA for a first home.</td></tr>
+        <tr><td><b>Rule of 55</b></td><td>If you leave a job in or after the year you turn 55, you can take money from <i>that job's</i> 401(k) without the 10% penalty.</td></tr>
+        <tr><td><b>401(k) loans</b></td><td>Many plans let you borrow from yourself (up to $50,000 or half your balance). If you leave the job, it may come due quickly.</td></tr>
+        <tr><td><b>Roth 5-year rule</b></td><td>Roth growth comes out tax-free once you're 59½ and the account is at least 5 years old.</td></tr>
+        <tr><td><b>Required withdrawals</b></td><td>Traditional accounts must start paying out at age 73 (75 if born in 1960 or later). Roth IRAs never require withdrawals during your lifetime.</td></tr>
+        <tr><td><b>Saver's Credit</b></td><td>Lower-income savers can get a tax credit for contributing (2026 income limits: $40,250 single, $60,375 head of household, $80,500 married filing jointly).</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <div class="panel doc">
+      <h2>A common order to fund things</h2>
+      <p>There's no single right answer, but many personal-finance guides suggest roughly this order. Your situation (job benefits, income, debts, goals) may change it.</p>
+      <ol class="steps">
+        <li>Build a small emergency fund so a surprise doesn't land on a credit card.</li>
+        <li>Contribute enough to get your employer's full match.</li>
+        <li>Pay off high-interest debt, like credit cards.</li>
+        <li>Grow the emergency fund toward 3–6 months of expenses.</li>
+        <li>If you have one, fund an HSA.</li>
+        <li>Fund a Roth or Traditional IRA.</li>
+        <li>Go back and raise your workplace plan contributions toward the limit.</li>
+        <li>Invest more in a regular brokerage account, or put extra toward lower-interest debt.</li>
+      </ol>
+      <p class="small muted">Rules and limits change, and taxes depend on your situation. For decisions with big tax consequences, a fee-only financial planner or tax professional can help.</p>
+    </div>
+  </section>
+
+
+  <footer>Everything you enter stays in this browser on this device. Nothing is sent to the person who shared this page or anyone else. Use <b>Backup</b> to save a backup file or a spreadsheet, or to move your plan to another device. This is a planning tool, not financial advice; real returns, pay and prices will differ.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const F0=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
+const F2=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});
+const usd=(n,d)=>n==null||!isFinite(n)?"—":(n<-0.004?"−":"")+(d?F2:F0).format(Math.abs(n));
+const usdK=n=>{const a=Math.abs(n);return a>=1e6?(n<0?"−":"")+"$"+(a/1e6).toFixed(a>=1e7?1:2)+"M":usd(n)};
+const num=v=>{const n=parseFloat(String(v??"").replace(/[$,\s%]/g,""));return isFinite(n)?n:0};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const DAY=864e5;
+const mk=(y,m,d)=>new Date(y,m,d,12);
+const parse=s=>{const m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?mk(+m[1],+m[2]-1,+m[3]):null};
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const addDays=(d,n)=>mk(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const mondayOf=d=>addDays(d,-((d.getDay()+6)%7));
+const md=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+const wkLabel=(a,b)=>a.getMonth()===b.getMonth()?`${md(a)}–${b.getDate()}`:`${md(a)} – ${md(b)}`;
+const now=new Date(), TODAY=mk(now.getFullYear(),now.getMonth(),now.getDate()), START=mondayOf(TODAY);
+const FREQ=[["weekly","Every week"],["biweekly","Every 2 weeks"],["semimonthly","Twice a month"],["monthly","Monthly"],["yearly","Once a year"],["once","One time"]];
+const PER_MONTH={weekly:52/12,biweekly:26/12,semimonthly:2,monthly:1,yearly:1/12,once:0};
+const ACCT=[["k401","401(k) / 403(b) / TSP","paycheck","Pre-tax"],["roth401k","Roth 401(k) / 403(b)","paycheck","Roth"],["ira","Traditional IRA","checking","Pre-tax"],["rothira","Roth IRA","checking","Roth"],["hsa","HSA","paycheck","HSA"],["brokerage","Brokerage (taxable)","checking","Taxable"],["savings","Savings / CD / money market","checking","Cash"]];
+const ACCT_BY=Object.fromEntries(ACCT.map(a=>[a[0],a]));
+
+/* ---------- state ---------- */
+const KEY="nest-egg-planner-v1";
+function defaults(){return {v:1,example:false,checking:0,savings:0,efGoal:10000,weeks:18,hold:3,asOf:iso(TODAY),view:"both",flex:0,tab:"money",
+  age:30,lifeTo:92,spend:"",ss:0,ssAge:67,pension:0,penAge:65,raise:2,infl:2.5,rr:7,real:true,
+  incomes:[],bills:[],pools:[],accounts:[],charges:[],
+  plans:{a:{name:"Current",ef:200,efDay:1,floor:500,scale:100,leftover:"keep",leftoverTo:"",retireAge:65},b:{name:"Stretch",ef:200,efDay:1,floor:500,scale:150,leftover:"invest",leftoverTo:"",retireAge:65}},
+  ret:{m:300,match:0,y:30,r:7}}}
+function example(){const o=defaults(),fri=addDays(START,4);
+  const k=uid(),rira=uid(),hsa=uid(),brk=uid();
+  Object.assign(o,{example:true,checking:2800,savings:4000,efGoal:12000,tab:"weeks",age:32,lifeTo:92,spend:4200,ss:2100,ssAge:67,pension:0,penAge:65,
+    incomes:[{id:uid(),name:"Paycheck",amount:2300,freq:"biweekly",date:iso(fri),day:1,day2:15}],
+    bills:[{id:uid(),name:"Rent",amount:1550,freq:"monthly",day:1,day2:15,date:""},{id:uid(),name:"Renters insurance",amount:18,freq:"monthly",day:1,day2:15,date:""},{id:uid(),name:"Gym",amount:35,freq:"monthly",day:3,day2:15,date:""},{id:uid(),name:"Utilities",amount:150,freq:"monthly",day:5,day2:15,date:""},{id:uid(),name:"Streaming",amount:30,freq:"monthly",day:9,day2:15,date:""},{id:uid(),name:"Car payment",amount:360,freq:"monthly",day:10,day2:15,date:""},{id:uid(),name:"Car insurance",amount:130,freq:"monthly",day:12,day2:15,date:""},{id:uid(),name:"Phone",amount:80,freq:"monthly",day:18,day2:15,date:""},{id:uid(),name:"Internet",amount:65,freq:"monthly",day:20,day2:15,date:""}],
+    pools:[{id:uid(),name:"Groceries",amount:500},{id:uid(),name:"Gas",amount:180},{id:uid(),name:"Eating out",amount:150},{id:uid(),name:"Everything else",amount:300}],
+    accounts:[{id:k,name:"Work 401(k)",type:"k401",balance:18000,you:350,employer:175,from:"paycheck",day:15},{id:rira,name:"Roth IRA",type:"rothira",balance:6500,you:200,employer:0,from:"checking",day:15},{id:hsa,name:"HSA",type:"hsa",balance:2100,you:100,employer:0,from:"paycheck",day:15},{id:brk,name:"Brokerage",type:"brokerage",balance:1200,you:0,employer:0,from:"checking",day:1}],
+    charges:[{id:uid(),name:"Car repair",amount:420,date:iso(addDays(START,16)),from:"cash",on:true}]});
+  o.plans.a.leftoverTo=brk;o.plans.b.leftoverTo=brk;return o}
+function blank(){const o=defaults();o.incomes=[{id:uid(),name:"Paycheck",amount:0,freq:"biweekly",date:iso(addDays(START,4)),day:1,day2:15}];
+  o.pools=[{id:uid(),name:"Groceries",amount:0},{id:uid(),name:"Gas",amount:0},{id:uid(),name:"Eating out",amount:0},{id:uid(),name:"Everything else",amount:0}];return o}
+function valid(o){return o&&o.v===1&&["incomes","bills","pools","accounts","charges"].every(k=>Array.isArray(o[k]))&&o.plans&&o.plans.a&&o.plans.b}
+function normalize(o){const b=defaults();for(const k of Object.keys(b))if(o[k]===undefined)o[k]=b[k];for(const p of ["a","b"])for(const k of Object.keys(b.plans[p]))if(o.plans[p][k]===undefined)o.plans[p][k]=b.plans[p][k];if(!o.ret)o.ret=b.ret;return o}
+let storeOK=true, savedAt=null;
+function load(){try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(valid(o))return normalize(o)}}catch(e){storeOK=false}return null}
+let S=load(); const firstVisit=!S; if(!S)S=example();
+let pt=null;
+function persist(){clearTimeout(pt);pt=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));storeOK=true;savedAt=new Date()}catch(e){storeOK=false}renderStatus()},350)}
+
+/* ---------- calendar ---------- */
+function occ(it,from,to){const out=[],f=it.freq;
+  if(f==="weekly"||f==="biweekly"){let a=parse(it.date);if(!a)return out;const step=f==="weekly"?7:14;const days=Math.round((from-a)/DAY);if(days>0)a=addDays(a,Math.ceil(days/step)*step);while(a<=to){if(a>=from)out.push(a);a=addDays(a,step)}}
+  else if(f==="monthly"||f==="semimonthly"){const ds=f==="monthly"?[it.day]:[it.day,it.day2];let m=mk(from.getFullYear(),from.getMonth(),1);
+    while(m<=to){const last=mk(m.getFullYear(),m.getMonth()+1,0).getDate();for(const dd of ds){const n=Math.round(num(dd));if(n<1)continue;const x=mk(m.getFullYear(),m.getMonth(),Math.min(n,last));if(x>=from&&x<=to)out.push(x)}m=mk(m.getFullYear(),m.getMonth()+1,1)}}
+  else if(f==="yearly"){const a=parse(it.date);if(!a)return out;for(let y=from.getFullYear();y<=to.getFullYear();y++){const x=mk(y,a.getMonth(),a.getDate());if(x>=from&&x<=to)out.push(x)}}
+  else if(f==="once"){const a=parse(it.date);if(a&&a>=from&&a<=to)out.push(a)}
+  return out}
+const monthlyPools=()=>S.pools.reduce((s,p)=>s+num(p.amount),0);
+const weeklyAllow=()=>monthlyPools()*12/52;
+const monthlyBills=()=>S.bills.reduce((s,i)=>s+num(i.amount)*PER_MONTH[i.freq],0);
+const monthlyIncome=()=>S.incomes.reduce((s,i)=>s+num(i.amount)*PER_MONTH[i.freq],0);
+function buildWeeks(n){const W=[];
+  for(let k=0;k<n;k++){const mon=addDays(START,7*k),sun=addDays(mon,6),from=k===0?TODAY:mon;
+    const inc=[],bil=[],acc=[],chg=[];
+    S.incomes.forEach(it=>{if(num(it.amount)>0)occ(it,from,sun).forEach(d=>inc.push({name:it.name||"Income",amt:num(it.amount),d}))});
+    S.bills.forEach(it=>{if(num(it.amount)>0)occ(it,from,sun).forEach(d=>bil.push({name:it.name||"Bill",amt:num(it.amount),d}))});
+    S.accounts.forEach(a=>{if(a.from==="checking"&&num(a.you)>0)occ({freq:"monthly",day:a.day||1},from,sun).forEach(d=>acc.push({id:a.id,name:a.name||"Account",amt:num(a.you),d}))});
+    S.charges.forEach(it=>{if(it.on!==false&&num(it.amount)>0){const d=parse(it.date);if(d&&d>=from&&d<=sun)chg.push({id:it.id,name:it.name||"Unexpected charge",amt:num(it.amount),from:it.from,d})}});
+    const sd=a=>a.sort((x,y)=>x.d-y.d);
+    W.push({mon,sun,from,inc:sd(inc),bil:sd(bil),acc:sd(acc),chg,inSum:inc.reduce((s,x)=>s+x.amt,0),billSum:bil.reduce((s,x)=>s+x.amt,0),days:Math.round((sun-from)/DAY)+1})}
+  return W}
+
+/* ---------- weekly engine ---------- */
+let WEEKS=null;
+const paycheckYou=()=>S.accounts.reduce((s,a)=>s+(a.from==="paycheck"?num(a.you):0),0);
+const leftTarget=P=>S.accounts.find(a=>a.id===P.leftoverTo)||S.accounts.find(a=>a.type==="brokerage")||S.accounts[0]||null;
+function simWeeks(key){
+  const P=S.plans[key], N=Math.max(4,Math.min(104,Math.round(num(S.weeks))||18)), H=Math.max(1,Math.min(8,Math.round(num(S.hold))||3));
+  const scale=Math.max(0,num(P.scale))/100, floor=num(P.floor), goal=num(S.efGoal), allow=Math.max(0,weeklyAllow()+num(S.flex));
+  const extraPayMonthly=(scale-1)*paycheckYou(), invest=P.leftover==="invest"&&!!leftTarget(P);
+  let chk=num(S.checking), ef=Math.max(0,num(S.savings)), invested=0, future=0;
+  const efFor=(w,bal)=>{const amt=num(P.ef);if(amt<=0||!occ({freq:"monthly",day:P.efDay||1},w.from,w.sun).length)return 0;return goal>0?Math.max(0,Math.min(amt,goal-bal)):amt};
+  const paycheckOut=w=>extraPayMonthly*12/52*(w.days/7);
+  const out=[];
+  for(let k=0;k<WEEKS.length;k++){const w=WEEKS[k];
+    let chCash=0,chEf=0;for(const c of w.chg){if(c.from==="savings"){const t=Math.min(ef,c.amt);ef-=t;chEf+=t;chCash+=c.amt-t}else chCash+=c.amt}
+    const accOut=w.acc.reduce((s,a)=>s+a.amt*scale,0), payX=paycheckOut(w), toEf=efFor(w,ef);
+    const start=chk, avail=start+w.inSum-w.billSum-accOut-payX-toEf-allow-chCash;
+    let hold=0,inv=0;
+    if(invest){let cum=0,minCum=0;for(let j=k+1;j<=k+H&&j<WEEKS.length;j++){const x=WEEKS[j];let cc=0;for(const c of x.chg)cc+=c.from==="savings"?Math.max(0,c.amt-ef):c.amt;
+        cum+=x.inSum-x.billSum-x.acc.reduce((s,a)=>s+a.amt*scale,0)-paycheckOut(x)-efFor(x,ef)-allow-cc;minCum=Math.min(minCum,cum)}
+      hold=-minCum;inv=Math.max(0,avail-floor-hold)}
+    chk=avail-inv; ef+=toEf; invested+=inv;
+    const payIn=(paycheckYou()*scale+S.accounts.reduce((s,a)=>s+(a.from==="paycheck"?num(a.employer):0),0))*12/52*(w.days/7)+S.accounts.reduce((s,a)=>s+(a.from==="checking"?num(a.employer):0),0)*12/52*(w.days/7);
+    future+=accOut+toEf+inv+payIn;
+    out.push({k,mon:w.mon,sun:w.sun,w,start,inn:w.inSum,accOut,payX,toEf,allow,chCash,chEf,hold,inv,end:chk,ef,future,net:chk-start,short:avail<floor-0.5})}
+  const win=out.slice(0,N), yr=out.slice(0,52);
+  return {key,P,weeks:win,N,investPerMonth:yr.reduce((s,x)=>s+x.inv,0)/12,
+    investWin:win.reduce((s,x)=>s+x.inv,0),futureWin:win.length?win[win.length-1].future:0,efEnd:win.length?win[win.length-1].ef:0,chkEnd:win.length?win[win.length-1].end:0,
+    lowest:win.reduce((m,x)=>!m||x.end<m.end?x:m,null),shortN:win.filter(x=>x.short).length}
+}
+
+/* ---------- retirement engine ---------- */
+function project(key,wk){
+  const P=S.plans[key], age0=Math.max(16,num(S.age)||30), life=Math.max(age0+1,num(S.lifeTo)||92), ra=Math.max(age0,num(P.retireAge)||65);
+  const r=(num(S.rr)||7)/1200, inf=num(S.infl)/100, raise=num(S.raise)/100, scale=Math.max(0,num(P.scale))/100;
+  const tgt=P.leftover==="invest"?leftTarget(P):null, extra=tgt?wk.investPerMonth:0;
+  const accts=S.accounts.map(a=>({id:a.id,name:a.name||"Account",type:a.type,ar:a.type==="savings"?num(a.rate??4)/1200:r,bal:Math.max(0,num(a.balance)),c:num(a.you)*scale+num(a.employer)+(tgt&&tgt.id===a.id?extra:0),you:num(a.you)*scale+(tgt&&tgt.id===a.id?extra:0)}));
+  const months=Math.round((life-age0)*12), rm=Math.round((ra-age0)*12);
+  const spendToday=String(S.spend).trim()===""?monthlyBills()+monthlyPools():num(S.spend);
+  let total=null,nest=0,byType={},depAge=null,yourIn=0,empIn=0; const pts=[];
+  const sumBal=()=>accts.reduce((s,a)=>s+a.bal,0);
+  for(let m=0;m<=months;m++){const yrs=m/12, age=age0+yrs;
+    if(m%12===0)pts.push({age:Math.round(age),bal:total==null?sumBal():total,yrs});
+    if(m===rm||(m===0&&rm<=0)){if(total==null){nest=sumBal();byType={};accts.forEach(a=>{const t=(ACCT_BY[a.type]||ACCT[0])[3];byType[t]=(byType[t]||0)+a.bal});total=nest}}
+    if(total==null){const g=(1+raise)**Math.floor(yrs);for(const a of accts){a.bal=a.bal*(1+a.ar)+a.c*g;yourIn+=a.you*g;empIn+=(a.c-a.you)*g}}
+    else{const f=(1+inf)**yrs,need=spendToday*f-(age>=num(S.ssAge)?num(S.ss)*f:0)-(age>=num(S.penAge)?num(S.pension)*f:0);
+      total=total*(1+r)-Math.max(0,need);if(total<=0&&depAge==null){depAge=age;total=0}}
+  }
+  const ry=Math.max(0,ra-age0), defl=(1+inf)**ry;
+  const ssAt=ra>=num(S.ssAge)?num(S.ss):0, penAt=ra>=num(S.penAge)?num(S.pension):0;
+  return {key,P,ra,nest,nestToday:nest/defl,defl,byType,income4:nest*0.04/12,income4Today:nest*0.04/12/defl,spendToday,ssToday:num(S.ss),penToday:num(S.pension),depAge,life,yourIn,empIn,pts,age0}
+}
+
+/* ---------- money tab ---------- */
+function fld(kind,id,f,label,val,type,cls){const iid=`${kind}-${id}-${f}`, data=`data-k="${kind}" data-id="${id}" data-f="${f}"`;
+  let input;
+  if(type==="freq")input=`<select id="${iid}" ${data}>${FREQ.map(([v,t])=>`<option value="${v}"${v===val?" selected":""}>${t}</option>`).join("")}</select>`;
+  else if(type==="from")input=`<select id="${iid}" ${data}><option value="cash"${val!=="savings"?" selected":""}>Cash flow</option><option value="savings"${val==="savings"?" selected":""}>Emergency fund</option></select>`;
+  else if(type==="atype")input=`<select id="${iid}" ${data}>${ACCT.map(a=>`<option value="${a[0]}"${a[0]===val?" selected":""}>${esc(a[1])}</option>`).join("")}</select>`;
+  else if(type==="paid")input=`<select id="${iid}" ${data}><option value="paycheck"${val!=="checking"?" selected":""}>My paycheck</option><option value="checking"${val==="checking"?" selected":""}>Checking</option></select>`;
+  else if(type==="text")input=`<input id="${iid}" ${data} type="text" maxlength="60" value="${esc(val)}" autocomplete="off">`;
+  else if(type==="date")input=`<input id="${iid}" ${data} type="date" value="${esc(val)}">`;
+  else if(type==="day")input=`<input id="${iid}" ${data} type="number" inputmode="numeric" min="1" max="31" step="1" value="${esc(val)}">`;
+  else input=`<input id="${iid}" ${data} type="number" inputmode="decimal" min="0" step="0.01" value="${esc(val)}">`;
+  return `<label class="f${cls?" "+cls:""}" for="${iid}">${label}${input}</label>`}
+function whenF(kind,it){const f=it.freq;
+  if(f==="monthly")return `<div class="when">${fld(kind,it.id,"day","Day of month",it.day,"day")}</div>`;
+  if(f==="semimonthly")return `<div class="when">${fld(kind,it.id,"day","1st day",it.day,"day")}${fld(kind,it.id,"day2","2nd day",it.day2,"day")}</div>`;
+  return `<div class="when">${fld(kind,it.id,"date",f==="once"?"Date":f==="yearly"?"Date each year":"Next date",it.date,"date")}</div>`}
+const del=(kind,id,name)=>`<button class="btn icon ghost" type="button" data-del="${kind}" data-id="${id}" aria-label="Remove ${esc(name||"row")}">✕</button>`;
+function renderList(kind){const box=$("#list-"+kind);if(!box)return;const arr=S[kind];
+  const emptyMsg={incomes:"No income yet.",bills:"No bills yet.",pools:"No categories yet.",accounts:"No accounts yet. Add a 401(k), IRA, HSA or brokerage account.",charges:"No unexpected charges. Add one here or from Week by week."}[kind];
+  if(!arr.length){box.innerHTML=`<p class="empty">${emptyMsg}</p>`;return}
+  box.innerHTML=arr.map(it=>{
+    if(kind==="incomes"||kind==="bills")return `<div class="item ${kind==="incomes"?"inc":"bill"}">${fld(kind,it.id,"name","Name",it.name,"text","wide")}${fld(kind,it.id,"amount","Amount",it.amount,"money")}${fld(kind,it.id,"freq","How often",it.freq,"freq")}${whenF(kind,it)}<div class="acts">${del(kind,it.id,it.name)}</div></div>`;
+    if(kind==="accounts")return `<div class="item acct">${fld(kind,it.id,"name","Name",it.name,"text","wide")}${fld(kind,it.id,"type","Type",it.type,"atype","wide")}${fld(kind,it.id,"balance","Balance today",it.balance,"money")}${fld(kind,it.id,"you","You put in / month",it.you,"money")}${it.type==="savings"?fld(kind,it.id,"rate","Interest % a year",it.rate??4,"money"):fld(kind,it.id,"employer","Employer adds / month",it.employer,"money")}${fld(kind,it.id,"from","Comes out of",it.from,"paid")}${it.from==="checking"?fld(kind,it.id,"day","Day of month",it.day,"day"):'<span></span>'}<div class="acts">${del(kind,it.id,it.name)}</div></div>`;
+    if(kind==="pools")return `<div class="item pool">${fld(kind,it.id,"name","Category",it.name,"text")}${fld(kind,it.id,"amount","Per month",it.amount,"money")}<div class="acts">${del(kind,it.id,it.name)}</div></div>`;
+    if(kind==="charges")return `<div class="item chg"><label class="chk" for="charges-${it.id}-on" style="padding-bottom:8px"><input id="charges-${it.id}-on" type="checkbox" data-k="charges" data-id="${it.id}" data-f="on"${it.on!==false?" checked":""}><span class="small">Count</span></label>${fld(kind,it.id,"name","What",it.name,"text")}${fld(kind,it.id,"amount","Amount",it.amount,"money")}${fld(kind,it.id,"date","Date",it.date,"date")}${fld(kind,it.id,"from","Pay from",it.from,"from")}<div class="acts">${del(kind,it.id,it.name)}</div></div>`;
+  }).join("")}
+function renderPlans(){$("#planCards").innerHTML=["a","b"].map(k=>{const p=S.plans[k],id=`plan-${k}`;
+  const f=(fl,label,val,attrs)=>`<label class="f" for="${id}-${fl}">${label}<input id="${id}-${fl}" data-k="plan" data-id="${k}" data-f="${fl}" ${attrs} value="${esc(val)}"></label>`;
+  const opts=S.accounts.map(a=>`<option value="${a.id}"${a.id===p.leftoverTo?" selected":""}>${esc(a.name||"Account")}</option>`).join("");
+  return `<div class="panel plancard${k==="b"?" b":""}"><div class="ph"><div><div class="eyebrow">Plan ${k.toUpperCase()}</div><h2>${esc(p.name||("Plan "+k.toUpperCase()))}</h2></div></div>
+    <div class="fgrid">${f("name","Plan name",p.name,'type="text" maxlength="24" autocomplete="off"')}${f("retireAge","Retire at age",p.retireAge,'type="number" inputmode="numeric" min="30" max="80" step="1"')}
+    ${f("ef","To emergency fund each month",p.ef,'type="number" inputmode="decimal" min="0" step="10"')}${f("efDay","Emergency fund day of month",p.efDay,'type="number" inputmode="numeric" min="1" max="31" step="1"')}
+    ${f("scale","Account contributions (% of what you entered)",p.scale,'type="number" inputmode="numeric" min="0" max="500" step="10"')}${f("floor","Keep in checking at least",p.floor,'type="number" inputmode="decimal" min="0" step="10"')}
+    <label class="f" for="${id}-leftover">Leftover cash each week<select id="${id}-leftover" data-k="plan" data-id="${k}" data-f="leftover"><option value="keep"${p.leftover!=="invest"?" selected":""}>Keep it in checking</option><option value="invest"${p.leftover==="invest"?" selected":""}>Invest it</option></select></label>
+    <label class="f" for="${id}-leftoverTo">Invest leftover in<select id="${id}-leftoverTo" data-k="plan" data-id="${k}" data-f="leftoverTo"${S.accounts.length?"":" disabled"}>${opts||"<option>Add an account first</option>"}</select></label></div>
+    <p class="small muted">The emergency fund stops getting money once it reaches your goal. ${k==="a"?"Plan A is usually what you do today.":"Plan B is a what-if: contribute more, invest leftover cash, or retire at a different age."}</p></div>`}).join("")}
+function renderSetup(){
+  const sv=(f,v)=>{const el=$("#s-"+f);if(el&&document.activeElement!==el)el.value=v};
+  ["checking","savings","efGoal","weeks","hold","asOf","age","lifeTo","spend","ss","ssAge","pension","penAge","raise","infl"].forEach(f=>sv(f,S[f]));
+  ["incomes","bills","pools","accounts","charges"].forEach(renderList);renderPlans();renderMoneySummary();renderRet()}
+function renderMoneySummary(){
+  const inc=monthlyIncome(),bil=monthlyBills(),pools=monthlyPools(),chkInv=S.accounts.reduce((s,a)=>s+(a.from==="checking"?num(a.you):0),0),payInv=paycheckYou(),emp=S.accounts.reduce((s,a)=>s+num(a.employer),0);
+  const left=inc-bil-pools-chkInv;
+  $("#poolNote").textContent=`${usd(pools)}/mo = ${usd(weeklyAllow())}/week`;
+  $("#moneySummary").innerHTML=`<div class="ph"><h2>Your month at a glance</h2><span class="small muted">Monthly averages</span></div>
+    <div class="kv"><span>Take-home income</span><span class="v">${usd(inc)}</span><span>Bills</span><span class="v">−${usd(bil)}</span><span>Flexible spending</span><span class="v">−${usd(pools)}</span><span>Investing from checking</span><span class="v">−${usd(chkInv)}</span><span class="sep"></span>
+    <b>Left for your emergency fund and extra saving</b><span class="v"><b style="color:${left<0?"var(--bad)":"var(--good)"}">${usd(left)}</b></span></div>
+    <p class="small muted">Also going to retirement each month: ${usd(payInv)} from your paychecks${emp>0?` and ${usd(emp)} from your employer`:""}. Saving rate: about ${inc>0?Math.round((payInv+chkInv)/(inc+payInv)*100):0}% of pay.${left<0?" Bills and spending are more than your income; trim a bill or a spending category.":""}</p>`}
+
+/* ---------- week view ---------- */
+let VIEW=S.view||"both", WK=null, PR=null, OPEN=null;
+const pname=k=>S.plans[k].name||("Plan "+k.toUpperCase());
+function chartFuture(A,B,both){const a=WK[A].weeks,b=WK[B].weeks,n=a.length;if(n<2)return '<p class="empty">Add your income to see the chart.</p>';
+  const W=760,H=220,L=60,R=18,T=18,Bm=28,vals=a.map(w=>w.future).concat(both?b.map(w=>w.future):[]);
+  const hi0=Math.max(1,...vals),raw=hi0/4,mag=10**Math.floor(Math.log10(raw)),hi=[1,1.25,1.5,2,2.5,3,4,5,6,8,10].map(m=>m*mag).find(v=>v>=raw)*4;
+  const x=i=>L+(i+1)/n*(W-L-R),y=v=>T+(1-v/hi)*(H-T-Bm);
+  let g="";for(let i=0;i<=4;i++){const v=hi*i/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--line)"/><text x="${L-8}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${v>=1000?"$"+(v/1000).toFixed(v%1000?1:0)+"k":"$"+Math.round(v)}</text>`}
+  let ticks="",lm=-1;a.forEach((w,i)=>{const m=w.sun.getMonth();if(m!==lm){lm=m;ticks+=`<text x="${x(i).toFixed(1)}" y="${H-8}" font-size="11" fill="var(--muted)" text-anchor="middle">${esc(w.sun.toLocaleDateString("en-US",{month:"short"}))}</text>`}});
+  const path=s=>`M${L} ${y(0).toFixed(1)}`+s.map((w,i)=>`L${x(i).toFixed(1)} ${y(w.future).toFixed(1)}`).join("");
+  const col=k=>`var(--${k})`, ea=a[n-1], eb=b[n-1], gap=y(eb.future)-y(ea.future);
+  const end=(w,c,dy)=>`<text x="${W-R}" y="${(y(w.future)+dy).toFixed(1)}" font-size="12" font-weight="600" fill="${c}" text-anchor="end" font-family="IBM Plex Mono,monospace">${usd(w.future)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Money put toward your future, total so far">${g}${both?`<path d="${path(b)}" fill="none" stroke="${col(B)}" stroke-width="2" stroke-dasharray="6 5"/>`:""}<path d="${path(a)}" fill="none" stroke="${col(A)}" stroke-width="2.75" stroke-linejoin="round"/>${end(ea,col(A),both&&gap>0?16:-8)}${both?end(eb,col(B),gap>0?-8:16):""}${ticks}</svg>`}
+function renderWeeks(){
+  const both=VIEW==="both", A=VIEW==="b"?"b":"a", B=A==="a"?"b":"a", ra=WK[A], rb=WK[B];
+  $("#segA").textContent=pname("a");$("#segB").textContent=pname("b");
+  $$("#viewSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===VIEW)));
+  $("#weeks").classList.toggle("single",!both);
+  const aw=ra.weeks,bw=rb.weeks;
+  if(!aw.length){$("#weeks").innerHTML='<p class="empty" style="padding:12px 14px">Add your income and bills on Your money to see your weeks.</p>';return}
+  if(OPEN===null)OPEN=new Set([iso(aw[0].mon)]);
+  const k=p=>`<span class="k ${p}">${esc(pname(p))}</span>`;
+  const warn=[];if(ra.shortN||(both&&rb.shortN))warn.push(`Checking dips below your cushion in ${Math.max(ra.shortN,both?rb.shortN:0)} of these weeks. Check your pay dates and bills, or lower spending.`);
+  $("#weeksWarn").innerHTML=warn.map(t=>`<div class="banner warn">${esc(t)}</div>`).join("");
+  const last=aw[aw.length-1];
+  const st=(label,f,sub)=>`<div class="stat"><span>${label} · ${k(A)}</span><b class="num">${f(ra)}</b><span>${both?`${k(B)} ${f(rb)}`:""}${sub?`${both?"<br>":""}${sub}`:""}</span></div>`;
+  $("#stats").innerHTML=st(`Toward your future by ${md(last.sun)}`,r=>usd(r.futureWin))+st("Emergency fund then",r=>usd(r.efEnd))+st("Checking then",r=>usd(r.chkEnd))+st("Tightest week",r=>r.lowest?usd(r.lowest.end):"—",ra.lowest?`week of ${md(ra.lowest.mon)}`:"");
+  $("#chartTitle").textContent=`Put toward your future, total so far · next ${aw.length} weeks`;
+  $("#legend").innerHTML=`<span><i style="background:var(--${A})"></i>${esc(pname(A))}</span>${both?`<span><i style="background:var(--${B})"></i>${esc(pname(B))} (dashed)</span>`:""}`;
+  $("#weekChart").innerHTML=chartFuture(A,B,both)+`<p class="small muted" style="margin-top:6px">Retirement contributions (yours and your employer's), emergency fund transfers and invested leftover cash.</p>`;
+  $("#weeksTitle").textContent=`Your next ${aw.length} weeks`;
+  const sel=$("#qcWeek"),cur=sel.value||iso(TODAY);sel.innerHTML=aw.map((w,i)=>{const v=iso(i===0?TODAY:w.mon);return `<option value="${v}"${v===cur?" selected":""}>${esc(wkLabel(w.mon,w.sun))}${i===0?" · this week":""}</option>`}).join("");
+  const pc=(x,p)=>`<div class="pc ${p}"><span class="k ${p}">${esc(pname(p))}</span><span class="amt${x.inv>0.5||x.net>0.5?"":" zero"}">${x.inv>0.5?"Invest "+usd(x.inv):(x.net>=0?"+":"−")+usd(Math.abs(x.net))+" net"}</span><span class="to">${x.toEf>0.5?`EF ${usd(x.toEf)} · `:""}ends ${usd(x.end)}</span></div>`;
+  const rowsDef=[
+    ["Checking at the start",x=>usd(x.start,true)],
+    ["Money in",x=>x.inn>0.005?"+"+usd(x.inn,true):"—"],
+    ["Bills",x=>x.w.billSum>0.005?"−"+usd(x.w.billSum,true):"—"],
+    ["Investing from checking",x=>x.accOut>0.005?"−"+usd(x.accOut,true):"—",1],
+    ["Extra paycheck contributions",x=>Math.abs(x.payX)>0.005?(x.payX>0?"−":"+")+usd(Math.abs(x.payX),true):"—",1],
+    ["Unexpected charges (cash)",x=>x.chCash>0.005?"−"+usd(x.chCash,true):"—",1],
+    ["Unexpected charges (from emergency fund)",x=>x.chEf>0.005?usd(x.chEf,true):"—",1],
+    ["To emergency fund",x=>x.toEf>0.005?"−"+usd(x.toEf,true):"—"],
+    ["Flexible spending",x=>"−"+usd(x.allow,true)],
+    ["Held back for upcoming weeks",x=>x.hold>0.005?usd(x.hold,true):"—",1],
+    ["Invested from leftover",x=>x.inv>0.005?"−"+usd(x.inv,true):"—",0,"key"],
+    ["Checking at week's end",x=>`<span style="color:${x.short?"var(--bad)":"inherit"}">${usd(x.end,true)}</span>`],
+    ["Emergency fund at week's end",x=>usd(x.ef,true)],
+    ["Toward your future so far",x=>usd(x.future)]];
+  const caret='<svg class="caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $("#weeks").innerHTML=aw.map((a,i)=>{const b=bw[i],w=a.w,key=iso(a.mon);
+    const ev=[];const incN=[...new Set(w.inc.map(x=>x.name))];if(incN.length)ev.push(`<span class="chip">${esc(incN.join(", "))}</span>`);
+    if(w.acc.length)ev.push(`<span class="chip">${esc([...new Set(w.acc.map(x=>x.name))].join(", "))}</span>`);
+    if(a.toEf>0.5||(both&&b.toEf>0.5))ev.push('<span class="chip good">Emergency fund</span>');
+    if(w.chg.length)ev.push(`<span class="chip warn">${w.chg.length===1?esc(w.chg[0].name):w.chg.length+" charges"} ${usd(w.chg.reduce((s,c)=>s+c.amt,0))}</span>`);
+    if(a.short||(both&&b.short))ev.push('<span class="chip bad">Below the cushion</span>');
+    const cell=(r,x)=>`<td class="n">${r[1](x)}</td>`;
+    const tbl=`<div class="tablewrap"><table><thead><tr><th></th><th class="n ${A}">${esc(pname(A))}</th>${both?`<th class="n ${B}">${esc(pname(B))}</th>`:""}</tr></thead><tbody>${rowsDef.filter(r=>!r[2]||r[1](a)!=="—"||(both&&r[1](b)!=="—")).map(r=>`<tr class="${r[3]==="key"?"key":""}"><td>${r[0]}</td>${cell(r,a)}${both?cell(r,b):""}</tr>`).join("")}</tbody></table></div>`;
+    const list=(t,arr)=>arr.length?`<p class="due"><b>${t}:</b> ${arr.map(x=>`${esc(x.name)} ${usd(x.amt)} (${md(x.d)})`).join("; ")}</p>`:"";
+    return `<details class="wk" data-mon="${key}"${OPEN.has(key)?" open":""}><summary><div class="dt"><b>${esc(wkLabel(a.mon,a.sun))}${i===0?' <span class="chip good" style="vertical-align:2px">This week</span>':""}</b><span class="sub">Spending ${usd(a.allow)} this week</span></div>${pc(a,A)}${both?pc(b,B):""}${caret}<div class="evts">${ev.join("")}</div></summary>
+      <div class="wkb">${tbl}${list("Money in",w.inc)}${list("Bills",w.bil)}${list("Investing from checking",w.acc)}${list("Unexpected",w.chg)}</div></details>`}).join("");
+  const all=$$("details.wk");$("#expandBtn").textContent=all.length&&all.every(d=>d.open)?"Collapse all weeks":"Expand all weeks";
+  const lo=iso(TODAY),hiD=iso(last.sun),qs=S.charges.filter(c=>c.date>=lo&&c.date<=hiD).sort((x,y)=>x.date<y.date?-1:1);
+  $("#qcList").innerHTML=qs.map(c=>`<div class="item chg" style="grid-template-columns:auto minmax(0,1fr) auto"><label class="chk" for="qc-${c.id}"><input id="qc-${c.id}" type="checkbox" data-k="charges" data-id="${c.id}" data-f="on"${c.on!==false?" checked":""}><span class="small">Count</span></label><div><b>${esc(c.name)}</b> <span class="num">${usd(num(c.amount),true)}</span><div class="small muted">${esc(md(parse(c.date)))} · ${c.from==="savings"?"Emergency fund":"Cash flow"}</div></div><div class="acts">${del("charges",c.id,c.name)}</div></div>`).join("");
+  $("#flexOut").textContent=(S.flex>0?"+":S.flex<0?"−":"")+usd(Math.abs(num(S.flex)))+"/wk";
+  if(document.activeElement!==$("#flexAdj"))$("#flexAdj").value=String(num(S.flex));
+}
+
+/* ---------- retirement view ---------- */
+function renderRetire(){
+  const A="a",B="b",pa=PR.a,pb=PR.b,real=!!S.real;
+  $$("#rrSeg button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.rr===+S.rr)));
+  $$("#realSeg button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.real==="1")===real)));
+  const k=p=>`<span class="k ${p}">${esc(pname(p))}</span>`;
+  const dol=(v,r,yrs)=>real?v/((1+num(S.infl)/100)**yrs):v;
+  const warn=[];
+  if(!S.accounts.length)warn.push("Add your retirement and investment accounts on Your money to see a projection.");
+  [pa,pb].forEach(r=>{if(r.ra<59.5&&r.ra>r.age0)warn.push(`${pname(r.key)} retires at ${r.ra}, before 59½. Money in 401(k)s and IRAs usually has a 10% penalty before then (with exceptions), so plan bridge money in a brokerage account or Roth contributions. See Retirement 101.`)});
+  $("#retWarn").innerHTML=[...new Set(warn)].map(t=>`<div class="banner warn">${esc(t)}</div>`).join("");
+  const nestV=r=>real?r.nestToday:r.nest, inc4=r=>real?r.income4Today:r.income4;
+  const lasts=r=>r.depAge==null?`Past ${r.life}`:`Age ${Math.floor(r.depAge)}`;
+  const st=(label,f,sub)=>`<div class="stat"><span>${label} · ${k(A)}</span><b class="num">${f(pa)}</b><span>${k(B)} <span class="num">${f(pb)}</span>${sub?`<br>${sub}`:""}</span></div>`;
+  $("#rStats").innerHTML=st("Saved at retirement",r=>usdK(nestV(r)),`at age ${pa.ra}${pb.ra!==pa.ra?` and ${pb.ra}`:""}`)+st("4% rule income / month",r=>usd(inc4(r)))+st("Money lasts to",lasts)+st("You put in by then",r=>usdK(r.yourIn),`in actual dollars, plus ${usdK(pa.empIn)} from your employer`);
+  // chart by age
+  const W=760,H=250,L=64,R=18,T=18,Bm=28,ages=pa.pts.map(p=>p.age),a0=ages[0],a1=ages[ages.length-1];
+  const sa=pa.pts.map(p=>({age:p.age,v:dol(p.bal,0,p.yrs)})),sb=pb.pts.map(p=>({age:p.age,v:dol(p.bal,0,p.yrs)}));
+  const hi0=Math.max(1,...sa.map(p=>p.v),...sb.map(p=>p.v)),raw=hi0/4,mag=10**Math.floor(Math.log10(raw)),stp=[1,1.25,1.5,2,2.5,3,4,5,6,8,10].map(m=>m*mag).find(v=>v>=raw),hi=stp*4;
+  const x=a=>L+(a-a0)/((a1-a0)||1)*(W-L-R),y=v=>T+(1-v/hi)*(H-T-Bm);
+  let g="";for(let i=0;i<=4;i++){const v=hi*i/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--line)"/><text x="${L-8}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${v===0?"$0":v>=1e6?"$"+(+(v/1e6).toFixed(2))+"M":"$"+Math.round(v/1000)+"k"}</text>`}
+  let ticks="";for(let a=Math.ceil(a0/10)*10;a<=a1;a+=10)ticks+=`<text x="${x(a).toFixed(1)}" y="${H-8}" font-size="11" fill="var(--muted)" text-anchor="middle">${a}</text>`;
+  const path=s=>s.map((p,i)=>`${i?"L":"M"}${x(p.age).toFixed(1)} ${y(p.v).toFixed(1)}`).join("");
+  const mark=(r,s,c,lab)=>{const p=s.find(q=>q.age>=r.ra)||s[s.length-1];return `<line x1="${x(r.ra).toFixed(1)}" x2="${x(r.ra).toFixed(1)}" y1="${T}" y2="${H-Bm}" stroke="${c}" stroke-dasharray="3 4" opacity=".6"/><circle cx="${x(p.age).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="4.5" fill="${c}" stroke="var(--surface)" stroke-width="2"/>`+(lab?`<text x="${(x(p.age)+8).toFixed(1)}" y="${(y(p.v)-10).toFixed(1)}" font-size="12" font-weight="700" fill="${c}" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round">${esc(usdK(p.v))} at ${r.ra}</text>`:"")};
+  $("#rChartTitle").textContent=`Retirement savings by age · ${S.rr}% a year · ${real?"today's dollars":"future dollars"}`;
+  $("#rLegend").innerHTML=`<span><i style="background:var(--a)"></i>${esc(pname("a"))}</span><span><i style="background:var(--b)"></i>${esc(pname("b"))} (dashed)</span>`;
+  $("#rChart").innerHTML=S.accounts.length?`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Retirement savings by age for both plans">${g}${ticks}<path d="${path(sb)}" fill="none" stroke="var(--b)" stroke-width="2" stroke-dasharray="6 5"/><path d="${path(sa)}" fill="none" stroke="var(--a)" stroke-width="2.75"/>${mark(pb,sb,"var(--b)",pb.ra!==pa.ra||Math.abs(pb.nest-pa.nest)>1)}${mark(pa,sa,"var(--a)",true)}</svg>`:'<p class="empty">Add an account to see your projection.</p>';
+  $("#rNote").textContent=`Investments grow ${S.rr}% a year before retirement and after${S.accounts.some(a=>a.type==="savings")?"; savings, CD and money market accounts grow at their own interest rate until retirement":""}. Contributions rise ${num(S.raise)}% a year. After retirement it pays your spending, minus Social Security and any pension. Real returns swing year to year.`;
+  // income panel
+  const incRow=(r)=>{const f=real?1:r.defl,ss=r.ra>=num(S.ssAge)?r.ssToday*f:0,pen=r.ra>=num(S.penAge)?r.penToday*f:0,i4=inc4(r),tot=i4+ss+pen,sp=r.spendToday*f;
+    return `<div class="kv"><span>From savings (4% rule)</span><span class="v">${usd(i4)}</span><span>Social Security${r.ra<num(S.ssAge)?` (starts at ${S.ssAge})`:""}</span><span class="v">${r.ra<num(S.ssAge)?usd(r.ssToday*f)+" later":usd(ss)}</span>${num(S.pension)>0?`<span>Pension${r.ra<num(S.penAge)?` (starts at ${S.penAge})`:""}</span><span class="v">${r.ra<num(S.penAge)?usd(r.penToday*f)+" later":usd(pen)}</span>`:""}<span class="sep"></span><b>Monthly income at ${r.ra}</b><span class="v"><b>${usd(tot)}</b></span><span>Spending you planned</span><span class="v">${usd(sp)}</span><b style="color:${tot>=sp?"var(--good)":"var(--warn)"}">${tot>=sp?"Covered":"Short"}</b><span class="v" style="color:${tot>=sp?"var(--good)":"var(--warn)"}">${tot>=sp?"+":"−"}${usd(Math.abs(tot-sp))}</span></div>`};
+  $("#incNote").textContent=real?"Today's dollars":"Future dollars";
+  $("#rIncome").innerHTML=`<div class="eyebrow" style="color:var(--a)">${esc(pname("a"))}</div>${incRow(pa)}<div class="eyebrow" style="color:var(--b);margin-top:10px">${esc(pname("b"))}</div>${incRow(pb)}<p class="small muted" style="margin-top:8px">The 4% rule is a common rule of thumb: take 4% of savings the first year, then adjust for inflation. It's not a guarantee.</p>`;
+  const types=["Pre-tax","Roth","HSA","Taxable","Cash"],tip={"Pre-tax":"Taxed as income when you take it out","Roth":"Tax-free in retirement if the rules are met","HSA":"Tax-free for medical costs; like pre-tax after 65","Taxable":"Taxed only on growth, usually at lower rates","Cash":"Savings, CDs and money market; interest taxed each year"};
+  $("#rTypes").innerHTML=`<table><thead><tr><th>Kind</th><th class="n a">${esc(pname("a"))}</th><th class="n b">${esc(pname("b"))}</th></tr></thead><tbody>${types.filter(t=>(pa.byType[t]||0)+(pb.byType[t]||0)>0).map(t=>`<tr><td>${t}<div class="small muted">${tip[t]}</div></td><td class="n">${usdK(real?(pa.byType[t]||0)/pa.defl:(pa.byType[t]||0))}</td><td class="n">${usdK(real?(pb.byType[t]||0)/pb.defl:(pb.byType[t]||0))}</td></tr>`).join("")||'<tr><td colspan="3" class="muted">No accounts yet.</td></tr>'}</tbody></table>`;
+  // milestones
+  const rows=pa.pts.filter((p,i)=>i===0||p.age%5===0||p.age===pa.ra||p.age===pb.ra);
+  $("#rTable").innerHTML=`<table><thead><tr><th>Age</th><th>Year</th><th class="n a">${esc(pname("a"))}</th><th class="n b">${esc(pname("b"))}</th></tr></thead><tbody>${rows.map(p=>{const q=pb.pts.find(z=>z.age===p.age);return `<tr><td class="num">${p.age}${p.age===pa.ra||p.age===pb.ra?' <span class="chip">retire</span>':""}</td><td class="num">${TODAY.getFullYear()+Math.round(p.yrs)}</td><td class="n">${usdK(dol(p.bal,0,p.yrs))}</td><td class="n">${q?usdK(dol(q.bal,0,q.yrs)):"—"}</td></tr>`}).join("")}</tbody></table>`;
+}
+
+/* ---------- learn tab calculator ---------- */
+function fv(c,ratePct,years){const r=ratePct/1200,n=Math.round(years*12);return r?c*((1+r)**n-1)/r:c*n}
+function renderRet(){const R=S.ret||(S.ret={m:300,match:0,y:30,r:7});if(!$("#rtOut"))return;
+  const sv=(id,v)=>{const el=$(id);if(el&&document.activeElement!==el)el.value=v};sv("#rt-m",R.m);sv("#rt-match",R.match);sv("#rt-y",R.y);
+  $$("#rtSeg button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.ret===+R.r)));
+  const m=Math.max(0,num(R.m)),em=Math.max(0,num(R.match)),y=Math.max(1,Math.min(50,num(R.y)||1)),c=m+em,tot=fv(c,num(R.r)||7,y);
+  const you=m*y*12,emp=em*y*12,gr=Math.max(0,tot-you-emp),pc=v=>tot>0?(v/tot*100).toFixed(2):0;
+  const marks=[10,20,30,40].filter(v=>v<y).map(v=>`${v} yrs ${usd(fv(c,num(R.r)||7,v))}`).join(" · ");
+  $("#rtOut").innerHTML=c<=0?'<p class="empty">Enter a monthly amount to see how it grows.</p>':`<div class="bigv num">${usd(tot)}</div><p class="small muted">after ${y} years at ${num(R.r)||7}% a year${marks?` · ${marks}`:""}</p>
+    <div class="bar" role="img" aria-label="You put in ${usd(you)}, employer ${usd(emp)}, growth ${usd(gr)}"><i style="width:${pc(you)}%;background:var(--a)"></i><i style="width:${pc(emp)}%;background:var(--good)"></i><i style="width:${pc(gr)}%;background:var(--b)"></i></div>
+    <div class="legend"><span><i style="background:var(--a)"></i>You put in ${usd(you)}</span>${emp>0?`<span><i style="background:var(--good)"></i>Employer added ${usd(emp)}</span>`:""}<span><i style="background:var(--b)"></i>Growth ${usd(gr)}</span></div>
+    <p class="small">Same deposits at 5%: <b class="num">${usd(fv(c,5,y))}</b> · 7%: <b class="num">${usd(fv(c,7,y))}</b> · 10%: <b class="num">${usd(fv(c,10,y))}</b>. Starting 10 years later at 7%: <b class="num">${y>10?usd(fv(c,7,y-10)):"—"}</b>.</p>`}
+
+/* ---------- compute & render ---------- */
+function compute(){const N=Math.max(52,Math.max(4,Math.min(104,Math.round(num(S.weeks))||18))+8);WEEKS=buildWeeks(N);WK={a:simWeeks("a"),b:simWeeks("b")};PR={a:project("a",WK.a),b:project("b",WK.b)}}
+function renderStatus(){const c=[];
+  if(!storeOK)c.push('<span class="chip bad">This browser isn\'t saving: use Backup</span>');
+  else c.push(`<span class="chip good">Saved in this browser${savedAt?" · "+savedAt.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}</span>`);
+  const ao=parse(S.asOf);if(ao&&(TODAY-ao)/DAY>7)c.push(`<span class="chip warn">Balances from ${esc(md(ao))}: update them</span>`);
+  c.push('<button class="btn" type="button" data-act="backup">Backup</button><button class="btn ghost" type="button" data-act="reset">Start over</button>');
+  $("#status").innerHTML=c.join("")}
+function renderBanner(){$("#banner").innerHTML=S.example?`<div class="banner"><span><b>This is an example household.</b> Replace the numbers on Your money with your own, or start from a blank plan.</span><span class="row"><button class="btn primary" type="button" data-act="mine">Enter my numbers</button><button class="btn" type="button" data-act="blank">Start blank</button><button class="btn" type="button" data-tab="howto">How it works</button></span></div>`:""}
+const TABS=["weeks","retire","money","howto","learn"];
+function showTab(t,push){if(!TABS.includes(t))t="weeks";S.tab=t;
+  TABS.forEach(x=>{$("#view-"+x).hidden=x!==t;$("#tab-"+x).setAttribute("aria-selected",String(x===t))});
+  if(push){try{history.replaceState(null,"","#"+t)}catch(e){location.hash=t}}
+  if(t==="retire")renderRetire()}
+function renderAll(){compute();renderStatus();renderBanner();renderWeeks();renderMoneySummary();if(S.tab==="retire")renderRetire()}
+let ct=null;function recompute(){clearTimeout(ct);ct=setTimeout(()=>{compute();renderWeeks();renderMoneySummary();if(S.tab==="retire")renderRetire();renderStatus()},160)}
+
+/* ---------- edits ---------- */
+const NUMF=new Set(["rate","checking","savings","efGoal","weeks","hold","amount","balance","you","employer","day","day2","floor","ef","efDay","scale","retireAge","flex","age","lifeTo","ss","ssAge","pension","penAge","raise","infl","m","match","y"]);
+function edited(){if(S.example){S.example=false;renderBanner()}}
+document.addEventListener("input",e=>{const t=e.target,k=t.dataset&&t.dataset.k;
+  if(t.id==="flexAdj"){S.flex=num(t.value);persist();recompute();return}
+  if(k==="ret"){S.ret[t.dataset.f]=num(t.value);persist();renderRet();return}
+  if(!k)return;const f=t.dataset.f;
+  const val=t.type==="checkbox"?t.checked:(f==="spend"?(String(t.value).trim()===""?"":num(t.value)):NUMF.has(f)?num(t.value):t.value);
+  if(k==="s"){S[f]=val}
+  else if(k==="plan"){S.plans[t.dataset.id][f]=val;if(f==="name"){const h=t.closest(".panel").querySelector("h2");if(h)h.textContent=val||("Plan "+t.dataset.id.toUpperCase())}}
+  else{const it=(S[k]||[]).find(x=>x.id===t.dataset.id);if(!it)return;it[f]=val;
+    if(k==="accounts"&&f==="type"){it.from=(ACCT_BY[val]||ACCT[0])[2];if(val==="savings"){if(it.rate==null||it.rate==="")it.rate=4;it.employer=0}renderList(k);renderPlans()}
+    if(k==="accounts"&&(f==="from"||f==="name")){if(f==="from")renderList(k);renderPlans();if(f==="from"){const el=$(`#accounts-${it.id}-from`);if(el)el.focus()}}
+    if(f==="freq"){if((val==="weekly"||val==="biweekly"||val==="once"||val==="yearly")&&!it.date)it.date=iso(TODAY);renderList(k);const el=$(`#${k}-${it.id}-freq`);if(el)el.focus()}
+    if(k==="charges"&&f==="on")$$(`[data-k="charges"][data-id="${it.id}"][data-f="on"]`).forEach(x=>{if(x!==t)x.checked=val})}
+  edited();persist();recompute()});
+document.addEventListener("toggle",e=>{const d=e.target;if(!(d instanceof HTMLDetailsElement)||!d.dataset.mon||!OPEN)return;d.open?OPEN.add(d.dataset.mon):OPEN.delete(d.dataset.mon);
+  const all=$$("details.wk");$("#expandBtn").textContent=all.every(x=>x.open)?"Collapse all weeks":"Expand all weeks"},true);
+let resetArm=false;
+document.addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.tab){showTab(t.dataset.tab,true);persist();return}
+  if(t.dataset.view){VIEW=t.dataset.view;S.view=VIEW;persist();renderWeeks();return}
+  if(t.dataset.rr){S.rr=+t.dataset.rr;persist();compute();renderRetire();return}
+  if(t.dataset.real){S.real=t.dataset.real==="1";persist();renderRetire();return}
+  if(t.dataset.ret){S.ret.r=+t.dataset.ret;persist();renderRet();return}
+  if(t.dataset.add){const k=t.dataset.add,base={id:uid()};
+    const add={incomes:{...base,name:"",amount:0,freq:"biweekly",date:iso(addDays(START,4)),day:1,day2:15},bills:{...base,name:"",amount:0,freq:"monthly",day:1,day2:15,date:""},pools:{...base,name:"",amount:0},accounts:{...base,name:"",type:"k401",balance:0,you:0,employer:0,rate:4,from:"paycheck",day:1},charges:{...base,name:"",amount:0,date:iso(TODAY),from:"cash",on:true}}[k];
+    S[k].push(add);renderList(k);if(k==="accounts")renderPlans();const el=$(`#${k}-${add.id}-name`);if(el)el.focus();edited();persist();recompute();return}
+  if(t.dataset.del){const k=t.dataset.del;S[k]=S[k].filter(x=>x.id!==t.dataset.id);renderList(k);if(k==="accounts")renderPlans();edited();persist();recompute();return}
+  const act=t.dataset.act;if(!act)return;
+  if(act==="expand"){const all=$$("details.wk"),to=!all.every(d=>d.open);all.forEach(d=>{d.open=to;to?OPEN.add(d.dataset.mon):OPEN.delete(d.dataset.mon)});t.textContent=to?"Collapse all weeks":"Expand all weeks";return}
+  if(act==="quickCharge"){const amt=num($("#qcAmt").value),m=$("#qcMsg");if(!(amt>0)){m.textContent="Enter an amount first.";m.className="msg bad";return}
+    const c={id:uid(),name:$("#qcName").value.trim()||"Unexpected charge",amount:Math.round(amt*100)/100,date:$("#qcWeek").value||iso(TODAY),from:$("#qcFrom").value,on:true};
+    S.charges.push(c);$("#qcName").value="";$("#qcAmt").value="";OPEN.add(iso(mondayOf(parse(c.date))));m.textContent=`Added ${c.name}. Every week below now includes it.`;m.className="msg good";
+    edited();persist();renderList("charges");compute();renderWeeks();renderMoneySummary();return}
+  if(act==="flexReset"){S.flex=0;persist();recompute();return}
+  if(act==="mine"){S.example=false;renderBanner();showTab("money",true);persist();return}
+  if(act==="blank"){S=blank();VIEW=S.view;OPEN=null;persist();renderSetup();renderAll();showTab("money",true);return}
+  if(act==="reset"){if(!resetArm){resetArm=true;t.textContent="Tap again to erase your plan";t.classList.add("danger");setTimeout(()=>{resetArm=false;renderStatus()},4000);return}
+    resetArm=false;S=blank();VIEW=S.view;OPEN=null;persist();renderSetup();renderAll();showTab("money",true);return}
+  if(act==="backup"){const p=$("#backupPanel");p.hidden=!p.hidden;if(!p.hidden){$("#codeBox").value=JSON.stringify(S);$("#backupMsg").textContent="";p.scrollIntoView({block:"nearest"})}return}
+  if(act==="closeBackup"){$("#backupPanel").hidden=true;return}
+  if(act==="copyCode"){const txt=JSON.stringify(S);$("#codeBox").value=txt;try{await navigator.clipboard.writeText(txt);bmsg("Backup code copied. Paste it somewhere safe, like a note to yourself.","good")}catch(err){$("#codeBox").select();bmsg("Select-all is on: copy the code from the box.","")}return}
+  if(act==="saveFile"){await saveOut(`nest-egg-plan-${iso(TODAY)}.json`,JSON.stringify(S,null,2),"application/json","Backup");return}
+  if(act==="saveCsv"){await saveOut(`nest-egg-plan-${iso(TODAY)}.csv`,toCSV(),"text/csv","Spreadsheet");return}
+  if(act==="loadCode"){importText($("#codeBox").value);return}
+});
+async function saveOut(fname,data,type,what){const d=await downloadsP;
+  if(!d&&STANDALONE){try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=fname;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);bmsg(`${what} saved to your downloads.`,"good")}catch(err){bmsg("Couldn't save the file. Use Copy backup code instead.","bad")}return}
+  if(!d){bmsg("Saving files isn't available here. Use Copy backup code instead.","bad");return}
+  try{await d.save({filename:fname,data});bmsg(`${what} saved.`,"good")}catch(err){bmsg(err&&err.code==="declined"?"Save canceled.":"Couldn't save the file. Use Copy backup code instead.","bad")}}
+
+/* ---------- spreadsheet (.csv) ---------- */
+const FREQ_LABEL=Object.fromEntries(FREQ);
+const SET_ROWS=[["Checking balance today","checking"],["Emergency fund today","savings"],["Emergency fund goal","efGoal"],["Balances as of","asOf"],["Weeks to show","weeks"],["Look-ahead for bills (weeks)","hold"],["Flexible spending vs budget per week","flex"],["Your age","age"],["Plan for money to last to age","lifeTo"],["Monthly spending in retirement","spend"],["Social Security per month","ss"],["Social Security starts at age","ssAge"],["Pension per month","pension"],["Pension starts at age","penAge"],["Raise each year (%)","raise"],["Inflation each year (%)","infl"],["Yearly return (%)","rr"]];
+const PLAN_ROWS=[["Plan name","name"],["Retire at age","retireAge"],["To emergency fund each month","ef"],["Emergency fund day of month","efDay"],["Account contributions (%)","scale"],["Keep in checking at least","floor"],["Leftover cash each week","leftover"],["Invest leftover in","leftoverTo"]];
+const COLS=["Section","Name","Amount","How often","Date","Day","Day 2","Type","Balance","You per month","Employer per month","Interest %","Comes out of","Pay from","Count","Value"];
+const r2=n=>Math.round(n*100)/100;
+function toCSV(){const q=v=>{v=v==null?"":String(v);return /^[=+\-@]/.test(v)&&isNaN(+v)?"'"+v:/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const rows=[["Nest Egg Planner",`Exported ${iso(TODAY)}`],["Edit the rows in the first table, then load this file back in with Backup > Load a backup. The tables after the first blank row are results and are ignored when loading."],[],COLS];
+  const row=o=>COLS.map(c=>o[c]??"");
+  const acctName=id=>{const a=S.accounts.find(x=>x.id===id);return a?a.name:""};
+  SET_ROWS.forEach(([l,k])=>rows.push(row({Section:"Setting",Name:l,Value:S[k]})));
+  ["a","b"].forEach(p=>PLAN_ROWS.forEach(([l,k])=>{let v=S.plans[p][k];if(k==="leftover")v=v==="invest"?"Invest it":"Keep in checking";if(k==="leftoverTo")v=acctName(v);rows.push(row({Section:"Plan "+p.toUpperCase(),Name:l,Value:v}))}));
+  S.incomes.forEach(i=>rows.push(row({Section:"Income",Name:i.name,Amount:i.amount,"How often":FREQ_LABEL[i.freq],Date:i.date,Day:i.day,"Day 2":i.day2})));
+  S.bills.forEach(i=>rows.push(row({Section:"Bill",Name:i.name,Amount:i.amount,"How often":FREQ_LABEL[i.freq],Date:i.date,Day:i.day,"Day 2":i.day2})));
+  S.pools.forEach(p=>rows.push(row({Section:"Spending",Name:p.name,Amount:p.amount})));
+  S.accounts.forEach(a=>rows.push(row({Section:"Account",Name:a.name,Type:(ACCT_BY[a.type]||ACCT[0])[1],Balance:a.balance,"You per month":a.you,"Employer per month":a.employer,"Interest %":a.type==="savings"?(a.rate??4):"","Comes out of":a.from==="checking"?"Checking":"Paycheck",Day:a.day})));
+  S.charges.forEach(c=>rows.push(row({Section:"Unexpected",Name:c.name,Amount:c.amount,Date:c.date,"Pay from":c.from==="savings"?"Emergency fund":"Cash flow",Count:c.on!==false?"Yes":"No"})));
+  if(WK&&PR){
+    rows.push([],["Retirement summary",`Return ${S.rr}%`,"Retire at age","Saved at retirement","Saved at retirement (today's $)","4% rule income per month (today's $)","Money lasts to age"]);
+    ["a","b"].forEach(p=>{const r=PR[p];rows.push([pname(p),"",r.ra,r2(r.nest),r2(r.nestToday),r2(r.income4Today),r.depAge==null?`Past ${r.life}`:Math.floor(r.depAge)])});
+    rows.push([],["Week of","Plan","Checking at start","Money in","Bills","Investing from checking","Extra paycheck contributions","Unexpected (cash)","Unexpected (from emergency fund)","To emergency fund","Flexible spending","Held back","Invested from leftover","Checking at end","Emergency fund at end","Toward your future so far"]);
+    WK.a.weeks.forEach((wa,i)=>{[["a",wa],["b",WK.b.weeks[i]]].forEach(([p,x])=>{if(!x)return;rows.push([iso(x.mon),pname(p),r2(x.start),r2(x.inn),r2(x.w.billSum),r2(x.accOut),r2(x.payX),r2(x.chCash),r2(x.chEf),r2(x.toEf),r2(x.allow),r2(x.hold),r2(x.inv),r2(x.end),r2(x.ef),r2(x.future)])})});
+    rows.push([],["Age","Year",`${pname("a")} (future $)`,`${pname("b")} (future $)`,`${pname("a")} (today's $)`,`${pname("b")} (today's $)`]);
+    const inf=num(S.infl)/100;PR.a.pts.forEach((p,i)=>{const q=PR.b.pts[i]||p,d=(1+inf)**p.yrs;rows.push([p.age,TODAY.getFullYear()+Math.round(p.yrs),r2(p.bal),r2(q.bal),r2(p.bal/d),r2(q.bal/d)])})}
+  return "\ufeff"+rows.map(x=>x.map(q).join(",")).join("\r\n")+"\r\n"}
+function parseCSV(t){t=String(t).replace(/^\ufeff/,"");const rows=[];let row=[],f="",inQ=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(inQ){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else inQ=false}else f+=c}
+    else if(c==='"')inQ=true;else if(c===","){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}else f+=c}
+  if(f!==""||row.length){row.push(f);rows.push(row)}return rows}
+function anyDate(v){v=String(v||"").trim();if(!v)return "";let m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return iso(mk(+m[1],+m[2]-1,+m[3]));
+  m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);if(m){let y=+m[3];if(y<100)y+=2000;return iso(mk(y,+m[1]-1,+m[2]))}return ""}
+const freqOf=v=>{v=String(v||"").trim().toLowerCase();const h=FREQ.find(([k,l])=>k===v||l.toLowerCase()===v);return h?h[0]:"monthly"};
+const typeOf=v=>{v=String(v||"").trim().toLowerCase();const h=ACCT.find(a=>a[0]===v||a[1].toLowerCase()===v);return h?h[0]:/roth/.test(v)&&/ira/.test(v)?"rothira":/roth/.test(v)?"roth401k":/ira/.test(v)?"ira":/hsa/.test(v)?"hsa":/brok|taxable/.test(v)?"brokerage":/sav|cd|money market|cash/.test(v)?"savings":"k401"};
+const yes=v=>/^(yes|y|true|1)$/i.test(String(v).trim());
+function fromCSV(text){const rows=parseCSV(text),hi=rows.findIndex(r=>(r[0]||"").trim()==="Section");if(hi<0)return null;
+  const H=rows[hi].map(h=>h.trim()),o=defaults();o.example=false;const leftNames={a:"",b:""};
+  for(let i=hi+1;i<rows.length;i++){const r=rows[i],sec=(r[0]||"").trim();if(!sec)break;const g=n=>{const j=H.indexOf(n);const v=j>=0?String(r[j]??"").trim():"";return /^'[=+\-@]/.test(v)?v.slice(1):v};
+    if(sec==="Setting"){const e=SET_ROWS.find(([l])=>l===g("Name"));if(!e)continue;const v=g("Value");o[e[1]]=e[1]==="asOf"?(anyDate(v)||iso(TODAY)):e[1]==="spend"&&v===""?"":num(v)}
+    else if(/^Plan [AB]$/.test(sec)){const p=sec.slice(-1).toLowerCase(),e=PLAN_ROWS.find(([l])=>l===g("Name"));if(!e)continue;const v=g("Value");
+      if(e[1]==="name")o.plans[p].name=v.slice(0,24);else if(e[1]==="leftover")o.plans[p].leftover=/invest/i.test(v)?"invest":"keep";else if(e[1]==="leftoverTo")leftNames[p]=v;else o.plans[p][e[1]]=num(v)}
+    else if(sec==="Income"||sec==="Bill")o[sec==="Income"?"incomes":"bills"].push({id:uid(),name:g("Name").slice(0,60),amount:num(g("Amount")),freq:freqOf(g("How often")),date:anyDate(g("Date")),day:num(g("Day"))||1,day2:num(g("Day 2"))||15});
+    else if(sec==="Spending")o.pools.push({id:uid(),name:g("Name").slice(0,60),amount:num(g("Amount"))});
+    else if(sec==="Account"){const ty=typeOf(g("Type"));o.accounts.push({id:uid(),name:g("Name").slice(0,60),type:ty,balance:num(g("Balance")),you:num(g("You per month")),employer:num(g("Employer per month")),rate:g("Interest %")===""?4:num(g("Interest %")),from:/pay/i.test(g("Comes out of"))?"paycheck":/check/i.test(g("Comes out of"))?"checking":ACCT_BY[ty][2],day:num(g("Day"))||1})}
+    else if(sec==="Unexpected")o.charges.push({id:uid(),name:g("Name").slice(0,60),amount:num(g("Amount")),date:anyDate(g("Date"))||iso(TODAY),from:/sav|emerg/i.test(g("Pay from"))?"savings":"cash",on:g("Count")===""||yes(g("Count"))});
+  }
+  ["a","b"].forEach(p=>{const a=o.accounts.find(x=>x.name===leftNames[p])||o.accounts.find(x=>x.type==="brokerage")||o.accounts[0];o.plans[p].leftoverTo=a?a.id:""});
+  if(![5,7,10].includes(o.rr))o.rr=7;
+  return o}
+function bmsg(t,c){const m=$("#backupMsg");m.textContent=t;m.className="msg "+(c||"")}
+function importText(txt){const t=String(txt||"").trim();let o=null,csv=false;
+  if(t.startsWith("{")){try{o=JSON.parse(t)}catch(e){}}else{o=fromCSV(t);csv=!!o;if(o){o.ret=S.ret;o.view=S.view;o.tab="weeks"}}
+  if(!valid(o)){bmsg(csv?"That spreadsheet is missing its Section column. Load a .csv saved from Nest Egg Planner.":"That doesn't look like a Nest Egg Planner backup. Check that you copied all of it.","bad");return}
+  const clean=a=>a.map(x=>({...x,id:String(x.id||uid()).replace(/[^a-z0-9]/gi,"").slice(0,12)||uid()}));
+  if(!csv){const map={};o.accounts=o.accounts.map(x=>{const nid=String(x.id||uid()).replace(/[^a-z0-9]/gi,"").slice(0,12)||uid();map[x.id]=nid;return {...x,id:nid}});["a","b"].forEach(p=>{if(o.plans[p].leftoverTo)o.plans[p].leftoverTo=map[o.plans[p].leftoverTo]||""})}
+  ["incomes","bills","pools","charges"].forEach(k=>o[k]=clean(o[k]));
+  S=normalize(o);S.example=false;VIEW=S.view||"both";OPEN=null;persist();renderSetup();renderAll();showTab(S.tab||"weeks",true);
+  bmsg(csv?`Spreadsheet loaded: ${S.incomes.length} income, ${S.bills.length} bills, ${S.accounts.length} accounts.`:"Plan loaded.","good")}
+$("#loadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(f.size>2e6){bmsg("That file is too large to be a plan backup.","bad");return}
+  const r=new FileReader();r.onload=()=>importText(r.result);r.onerror=()=>bmsg("Couldn't read that file.","bad");r.readAsText(f);e.target.value=""});
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(TABS.includes(h))showTab(h,false)});
+
+/* ---------- boot ---------- */
+let downloadsP=Promise.resolve(null);const STANDALONE=!(window.claude&&window.claude.use);
+try{downloadsP=window.claude&&claude.use?claude.use("downloads").catch(()=>null):Promise.resolve(null)}catch(e){}
+downloadsP.then(d=>{if(!d&&!STANDALONE)["#saveFileBtn","#saveCsvBtn"].forEach(id=>{const b=$(id);if(b)b.hidden=true})});
+renderSetup();renderAll();
+const h=location.hash.slice(1);showTab(TABS.includes(h)?h:(firstVisit?"weeks":S.tab||"weeks"),false);
+if(firstVisit)persist();
+})();
+
+</script>
+
+</body>
+</html>
