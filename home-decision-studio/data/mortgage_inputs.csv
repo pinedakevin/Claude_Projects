@@ -1,15 +1,15 @@
 key,label,value,unit,source
-conv_rate,"30-yr fixed, conventional",7.32,%,"Freddie Mac PMMS, week of Oct 22, 2026"
-conv_rate_15,"15-yr fixed, conventional",6.68,%,"Freddie Mac PMMS, week of Oct 22, 2026"
-va_rate,"30-yr fixed, VA",7.0,%,"Average of Zillow (6.85%, Oct 23) and Mortgage Reports partner table (7.144%, Oct 23)"
-va_rate_15,"15-yr fixed, VA",6.62,%,"30-yr VA rate minus the 0.38-pt 15-yr discount in The Military Wallet's VA quotes (6.76% / 6.38%, Oct 24)"
+conv_rate,"30-yr fixed, conventional",7.24,%,"Freddie Mac PMMS via FRED, week of Oct 29, 2026"
+conv_rate_15,"15-yr fixed, conventional",6.60,%,"Freddie Mac PMMS via FRED, week of Oct 29, 2026"
+va_rate,"30-yr fixed, VA",6.92,%,"Estimated: conv rate -0.32 pt (gap measured from Oct 2026 quotes), week of Oct 29, 2026"
+va_rate_15,"15-yr fixed, VA",6.54,%,"Estimated: va rate -0.38 pt (gap measured from Oct 2026 quotes), week of Oct 29, 2026"
 tax_rate_salt_lake,"Property tax, Salt Lake County",0.6,% of market value,"Property Tax Almanac, county median effective rate (updated Apr 2026)"
 tax_rate_utah,"Property tax, Utah County",0.55,% of market value,"Property Tax Almanac, county median effective rate (updated Apr 2026)"
 insurance_rate,Homeowners insurance,0.32,% of home value per year,"NerdWallet's Salt Lake City average ($1,860/yr) divided by the middle city's typical home (~$581k, all 20 cities)"
 vet_exempt_limit,Disabled-veteran exemption cap,535459,$ taxable value,"Utah, 2025 tax year (vetcalc.org); scales with rating"
 residential_share,Taxable share of a primary home,55,% of market value,Utah 45% primary-residence exemption
-fha_rate,"30-yr fixed, FHA",7.17,%,"Mortgage Reports daily partner table, Oct 23, 2026 (7.168%)"
-fha_rate_15,"15-yr fixed, FHA",6.79,%,"30-yr FHA rate minus the 0.38-pt 15-yr discount seen in VA quotes (estimate)"
-fha_limit_salt_lake,"FHA loan limit, Salt Lake County",637100,$ (one unit),"HUD 2026 limit via HSH.com"
-fha_limit_utah,"FHA loan limit, Utah County",601450,$ (one unit),"HUD 2026 limit via HSH.com"
+fha_rate,"30-yr fixed, FHA",7.09,%,"Estimated: conv rate -0.15 pt (gap measured from Oct 2026 quotes), week of Oct 29, 2026"
+fha_rate_15,"15-yr fixed, FHA",6.71,%,"Estimated: fha rate -0.38 pt (gap measured from Oct 2026 quotes), week of Oct 29, 2026"
+fha_limit_salt_lake,"FHA loan limit, Salt Lake County",637100,$ (one unit),HUD 2026 limit via HSH.com
+fha_limit_utah,"FHA loan limit, Utah County",601450,$ (one unit),HUD 2026 limit via HSH.com
 fha_ufmip,FHA upfront mortgage insurance,1.75,% of base loan,"HUD, via Bankrate (added to the loan)"
