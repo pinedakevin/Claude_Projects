@@ -872,5 +872,9 @@ if(firstVisit)persist();
 })();
 </script>
 
+<script>
+/* Day rollover (Nov 2, 2026): this page works out "today" when it opens, so reload it when the date changes. */
+(function(){var k=function(){var d=new Date();return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()};var t0=k();function c(){if(k()!==t0){try{location.reload()}catch(e){}}}setInterval(c,60000);document.addEventListener("visibilitychange",function(){if(!document.hidden)c()});})();
+</script>
 </body>
 </html>
